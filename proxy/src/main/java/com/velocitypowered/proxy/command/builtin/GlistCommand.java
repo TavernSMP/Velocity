@@ -119,7 +119,7 @@ public class GlistCommand {
                   ? "velocity.command.glist-player-singular"
                   : "velocity.command.glist-player-plural"
             ).color(NamedTextColor.YELLOW)
-            .arguments(Component.text(Integer.toString(online), NamedTextColor.GREEN));
+            .arguments(Component.text(Integer.toString(online)));
     target.sendMessage(msg.build());
   }
 
