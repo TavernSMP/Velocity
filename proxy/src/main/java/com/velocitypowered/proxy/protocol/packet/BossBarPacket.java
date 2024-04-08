@@ -278,7 +278,7 @@ public class BossBarPacket implements MinecraftPacket {
   private static byte serializeFlags(Set<BossBar.Flag> flags) {
     byte val = 0x0;
     for (BossBar.Flag flag : flags) {
-      val |= (byte) FLAG_BITS_TO_PROTOCOL.get(flag);
+      val |= FLAG_BITS_TO_PROTOCOL.get(flag);
     }
     return val;
   }
