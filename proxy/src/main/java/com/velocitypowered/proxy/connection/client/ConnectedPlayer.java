@@ -854,7 +854,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
 
             RegisteredServer registeredServer = server.getServer(serverName).orElse(null);
             if (registeredServer == null) {
-              logger.error(Component.text("Invalid server found in the config. Make sure all servers under 'try' are spelled correctly!"));
+              logger.error(Component.text("Unable to read your velocity.toml fallback servers. Users are unable to connect."));
               return emptiestServer;
             }
 
