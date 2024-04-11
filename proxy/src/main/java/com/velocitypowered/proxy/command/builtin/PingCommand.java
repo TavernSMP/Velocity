@@ -46,7 +46,7 @@ public class PingCommand {
    */
   public void register() {
     LiteralArgumentBuilder<CommandSource> node = BrigadierCommand.literalArgumentBuilder("ping")
-        .requires(source -> source.getPermissionValue("velocity.command.ping") != Tristate.FALSE)
+        .requires(source -> source.getPermissionValue("velocity.command.ping") == Tristate.TRUE)
         .then(
             BrigadierCommand.requiredArgumentBuilder("player", StringArgumentType.word())
                 .suggests((context, builder) -> {
