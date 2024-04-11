@@ -54,6 +54,8 @@ public class HubCommand {
 
   private int lobby(final CommandContext<CommandSource> context) {
     if (!(context.getSource() instanceof Player player)) {
+      return 0;
+    } else {
       context.getSource().sendMessage(CommandMessages.PLAYERS_ONLY);
       return 0;
     }
