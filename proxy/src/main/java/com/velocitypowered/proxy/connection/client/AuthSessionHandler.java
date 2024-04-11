@@ -92,10 +92,10 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
 
     // Make sure the player is on the minimum version set in configuration or higher
     if (!versionCheck(mcConnection)) {
-        if (server.getConfiguration().isLogOfflineConnections()
-        && server.getConfiguration().isLogPlayerConnections()) {
-    return;
-}
+      if (server.getConfiguration().isLogPlayerConnections()
+            && server.getConfiguration().isLogOfflineConnections()) {
+        return;
+      }
 
       final String discMessage = String.format("[initial connection] %s (%s) has disconnected: ",
               finalProfile.getName(),
