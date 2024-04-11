@@ -49,7 +49,12 @@ public class PingCommand {
         .requires(source -> source.getPermissionValue("velocity.command.ping") == Tristate.TRUE)
         .then(
             BrigadierCommand.requiredArgumentBuilder("player", StringArgumentType.word())
+                .requires(source -> source.getPermissionValue("velocity.command.ping.others") == Tristate.TRUE)
                 .suggests((context, builder) -> {
+                  CommandSource source = context.getSource();
+                  if (source.getPermissionValue("velocity.command.ping.others") != Tristate.TRUE) {
+                    return builder.buildFuture();
+                  }
                   final String argument = context.getArguments().containsKey("player")
                       ? context.getArgument("player", String.class)
                       : "";
