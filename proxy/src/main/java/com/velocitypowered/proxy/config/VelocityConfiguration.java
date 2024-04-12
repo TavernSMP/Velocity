@@ -92,11 +92,13 @@ public class VelocityConfiguration implements ProxyConfig {
   @Expose
   private boolean forceKeyAuthentication = true; // Added in 1.19
   @Expose
-  private boolean logOfflineConnections = false;
+  private boolean logOfflineConnections = true;
   @Expose
-  private boolean disableForge = true;
+  private boolean disableForge = false;
   @Expose
-  private boolean enforceChatSigning = false;
+  private boolean enforceChatSigning = true;
+  @Expose
+  private boolean logModernForwarding = false;
   @Expose
   private String minimumVersion = "1.7.2";
 
@@ -115,7 +117,8 @@ public class VelocityConfiguration implements ProxyConfig {
       boolean onlineModeKickExistingPlayers, PingPassthroughMode pingPassthrough,
       boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
       Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
-      boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning, String minimumVersion) {
+      boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning, boolean logModernForwarding,
+      String minimumVersion) {
     this.bind = bind;
     this.motd = motd;
     this.showMaxPlayers = showMaxPlayers;
@@ -136,6 +139,7 @@ public class VelocityConfiguration implements ProxyConfig {
     this.logOfflineConnections = logOfflineConnections;
     this.disableForge = disableForge;
     this.enforceChatSigning = enforceChatSigning;
+    this.logModernForwarding = logModernForwarding;
     this.minimumVersion = minimumVersion;
   }
 
@@ -452,6 +456,7 @@ public class VelocityConfiguration implements ProxyConfig {
         .add("logOfflineConnections", logOfflineConnections)
         .add("disableForge", disableForge)
         .add("enforceChatSigning", enforceChatSigning)
+        .add("logModernForwarding", logModernForwarding)
         .add("minimumVersion", minimumVersion)
         .toString();
   }
@@ -547,6 +552,8 @@ public class VelocityConfiguration implements ProxyConfig {
       final boolean disableForge = config.getOrElse("disable-forge", true);
       final boolean enforceChatSigning = config.getOrElse(
           "enforce-chat-signing", false);
+      final boolean logModernForwarding = config.getOrElse(
+              "log-modern-forwarding", false);
       final String minimumVersion = config.getOrElse("minimum-version", "1.7.2");
 
       // Throw an exception if the forwarding-secret file is empty and the proxy is using a
@@ -578,6 +585,7 @@ public class VelocityConfiguration implements ProxyConfig {
               logOfflineConnections,
               disableForge,
               enforceChatSigning,
+              logModernForwarding,
               minimumVersion
       );
     }
@@ -613,6 +621,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
   public boolean enforceChatSigning() {
     return enforceChatSigning;
+  }
+
+  public boolean isLoggingModernForwarding() {
+    return logModernForwarding;
   }
 
   public String getMinimumVersion() {
