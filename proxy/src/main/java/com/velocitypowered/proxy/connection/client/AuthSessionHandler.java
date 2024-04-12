@@ -49,7 +49,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -60,7 +59,6 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 public class AuthSessionHandler implements MinecraftSessionHandler {
 
   private static final Logger logger = LogManager.getLogger(AuthSessionHandler.class);
-  private static final ComponentLogger componentLogger = ComponentLogger.logger(AuthSessionHandler.class);
 
   private final VelocityServer server;
   private final MinecraftConnection mcConnection;
@@ -69,7 +67,6 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
   private @MonotonicNonNull ConnectedPlayer connectedPlayer;
   private final boolean onlineMode;
   private State loginState = State.START; // 1.20.2+
-  private final String minimumVersion;
 
   AuthSessionHandler(VelocityServer server, LoginInboundConnection inbound,
       GameProfile profile, boolean onlineMode) {
@@ -78,7 +75,6 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
     this.profile = Preconditions.checkNotNull(profile, "profile");
     this.onlineMode = onlineMode;
     this.mcConnection = inbound.delegatedConnection();
-    this.minimumVersion = server.getConfiguration().getMinimumVersion();
   }
 
   @Override
@@ -89,24 +85,6 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
     GameProfileRequestEvent profileRequestEvent = new GameProfileRequestEvent(inbound, profile,
         onlineMode);
     final GameProfile finalProfile = profile;
-
-    // Make sure the player is on the minimum version set in configuration or higher
-    if (!versionCheck(mcConnection)) {
-      if (server.getConfiguration().isLogPlayerConnections()
-            && server.getConfiguration().isLogOfflineConnections()
-            && server.getConfiguration().isLoggingModernForwarding()) {
-        return;
-      }
-
-      final String discMessage = String.format("[initial connection] %s (%s) has disconnected: ",
-              finalProfile.getName(),
-              mcConnection.getRemoteAddress().toString());
-
-      componentLogger.info(Component.text(discMessage).append(
-              Component.translatable("velocity.error.modern-forwarding-needs-new-client", NamedTextColor.RED)
-              .arguments(Component.text(minimumVersion))));
-      return;
-    }
 
     server.getEventManager().fire(profileRequestEvent).thenComposeAsync(profileEvent -> {
       if (mcConnection.isClosed()) {
@@ -149,21 +127,6 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
       logger.error("Exception during connection of {}", finalProfile, ex);
       return null;
     });
-  }
-
-  private boolean versionCheck(MinecraftConnection connection) {
-    final ProtocolVersion minimumProtocolVersion = ProtocolVersion.getVersionByName(minimumVersion);
-    final String clientProtocolVersion = connection.getProtocolVersion().getVersionIntroducedIn();
-
-    // Compare the client's protocol version with the minimum required version
-    if (ProtocolVersion.getVersionByName(clientProtocolVersion).lessThan(minimumProtocolVersion)) {
-      // Disconnect the player with an error message if client version is too low
-      this.inbound.disconnect(Component.translatable("velocity.error.modern-forwarding-needs-new-client", NamedTextColor.RED)
-              .arguments(Component.text(minimumVersion)));
-      return false;
-    }
-
-    return true;
   }
 
   private void startLoginCompletion(ConnectedPlayer player) {
