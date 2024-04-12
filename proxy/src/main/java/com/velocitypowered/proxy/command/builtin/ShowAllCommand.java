@@ -29,6 +29,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -81,36 +82,40 @@ public class ShowAllCommand {
   private int find(final CommandContext<CommandSource> context) {
     final String serverName = context.getArgument("server", String.class);
     final Optional<RegisteredServer> maybeServer = server.getServer(serverName);
+
     if (maybeServer.isEmpty()) {
-      context.getSource().sendMessage(
-          CommandMessages.PLAYER_NOT_FOUND.arguments(Component.text(serverName))
-      );
+      final Component errorMessage = CommandMessages.PLAYER_NOT_FOUND.arguments(Component.text(serverName));
+      context.getSource().sendMessage(errorMessage);
       return 0;
     }
 
-    // can't be null, already checking if it's empty before
-    RegisteredServer server = maybeServer.orElse(null);
-    int playersConnected = server.getPlayersConnected().size();
+    final RegisteredServer server = maybeServer.orElse(null);
+    final int connectedPlayers = server.getPlayersConnected().size();
 
-    context.getSource().sendMessage(
-        Component.translatable("velocity.command.showall.header", NamedTextColor.YELLOW)
-                .arguments(Component.text(playersConnected), Component.text(server.getServerInfo().getName()))
-    );
+    final Component header = Component.translatable(
+                    connectedPlayers == 0 ? "velocity.command.showall.header-none" :
+                            (connectedPlayers == 1 ? "velocity.command.showall.header-singular" :
+                                    "velocity.command.showall.header-plural"),
+                    NamedTextColor.YELLOW)
+            .arguments(Component.text(connectedPlayers), Component.text(server.getServerInfo().getName()));
 
-    StringBuilder builder = new StringBuilder();
+    context.getSource().sendMessage(header);
 
-    for (int i = 0; i < playersConnected; i++) {
-      Player p = server.getPlayersConnected().stream().toList().get(i);
-      builder.append(p.getUsername());
-      if (i + 1 != playersConnected) {
-        builder.append(", ");
+    if (connectedPlayers > 0) {
+      final Component message;
+      if (connectedPlayers == 1) {
+        final Player singlePlayer = server.getPlayersConnected().iterator().next();
+        message = Component.translatable("velocity.command.showall.message", NamedTextColor.WHITE,
+                Component.text(singlePlayer.getUsername()));
+      } else {
+        final String playerList = server.getPlayersConnected().stream()
+                .map(Player::getUsername)
+                .collect(Collectors.joining(", "));
+        message = Component.translatable("velocity.command.showall.message", NamedTextColor.WHITE,
+                Component.text(playerList));
       }
+      context.getSource().sendMessage(message);
     }
-
-    context.getSource().sendMessage(
-        Component.translatable("velocity.command.showall.message", NamedTextColor.WHITE,
-            Component.text(builder.toString()))
-    );
     return Command.SINGLE_SUCCESS;
   }
 }
