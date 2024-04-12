@@ -82,7 +82,6 @@ public class ShowAllCommand {
   private int find(final CommandContext<CommandSource> context) {
     final String serverName = context.getArgument("server", String.class);
     final Optional<RegisteredServer> maybeServer = server.getServer(serverName);
-
     if (maybeServer.isEmpty()) {
       final Component errorMessage = CommandMessages.PLAYER_NOT_FOUND.arguments(Component.text(serverName));
       context.getSource().sendMessage(errorMessage);
