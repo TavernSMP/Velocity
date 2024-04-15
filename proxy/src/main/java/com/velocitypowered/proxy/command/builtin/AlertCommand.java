@@ -27,6 +27,8 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -37,32 +39,33 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public class AlertCommand {
 
   private final ProxyServer server;
-
+  private static final Pattern symbolTranslator = Pattern.compile("(&#[A-Fa-f0-9]{6})|(#([A-Fa-f0-9]{6}))");
   private static final Map<String, String> colorMap = new HashMap<>();
 
   static {
-    colorMap.put("&0", "<black>");
-    colorMap.put("&1", "<dark_blue>");
-    colorMap.put("&2", "<dark_green>");
-    colorMap.put("&3", "<dark_aqua>");
-    colorMap.put("&4", "<dark_red>");
-    colorMap.put("&5", "<dark_purple>");
-    colorMap.put("&6", "<gold>");
-    colorMap.put("&7", "<gray>");
-    colorMap.put("&8", "<dark_gray>");
-    colorMap.put("&9", "<blue>");
-    colorMap.put("&a", "<green>");
-    colorMap.put("&b", "<aqua>");
-    colorMap.put("&c", "<red>");
-    colorMap.put("&d", "<light_purple>");
-    colorMap.put("&e", "<yellow>");
-    colorMap.put("&f", "<white>");
+    colorMap.put("&0", "<reset><black>");
+    colorMap.put("&1", "<reset><dark_blue>");
+    colorMap.put("&2", "<reset><dark_green>");
+    colorMap.put("&3", "<reset><dark_aqua>");
+    colorMap.put("&4", "<reset><dark_red>");
+    colorMap.put("&5", "<reset><dark_purple>");
+    colorMap.put("&6", "<reset><gold>");
+    colorMap.put("&7", "<reset><gray>");
+    colorMap.put("&8", "<reset><dark_gray>");
+    colorMap.put("&9", "<reset><blue>");
+    colorMap.put("&a", "<reset><green>");
+    colorMap.put("&b", "<reset><aqua>");
+    colorMap.put("&c", "<reset><red>");
+    colorMap.put("&d", "<reset><light_purple>");
+    colorMap.put("&e", "<reset><yellow>");
+    colorMap.put("&f", "<reset><white>");
     colorMap.put("&k", "<obfuscated>");
     colorMap.put("&l", "<bold>");
     colorMap.put("&m", "<strikethrough>");
     colorMap.put("&n", "<underlined>");
     colorMap.put("&o", "<italic>");
     colorMap.put("&r", "<reset>");
+    colorMap.put("\\n", "<newline>");
   }
 
   public AlertCommand(ProxyServer server) {
@@ -100,9 +103,25 @@ public class AlertCommand {
       return 0;
     }
 
+    message = message.replace("§", "&");
+
+    for (Map.Entry<String, String> entry : colorMap.entrySet()) {
+      message = message.replace(entry.getKey(), entry.getValue());
+    }
+
     for (String s : colorMap.keySet()) {
       message = message.replace(s, colorMap.get(s));
     }
+
+    Matcher matcher = symbolTranslator.matcher(message);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String match = matcher.group();
+      String replacement = "<" + match.replace("&", "") + ">";
+      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+    }
+    matcher.appendTail(sb);
+    message = sb.toString();
 
     server.sendMessage(Component.translatable("velocity.command.alert.message", NamedTextColor.YELLOW,
             MiniMessage.miniMessage().deserialize(message)));
