@@ -39,8 +39,8 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public class AlertCommand {
 
   private final ProxyServer server;
-  private static final Pattern symbolTranslator = Pattern.compile("(&#[A-Fa-f0-9]{6})|(#([A-Fa-f0-9]{6}))");
   private static final Map<String, String> colorMap = new HashMap<>();
+  private static final Pattern symbolTranslator = Pattern.compile("(&#[A-Fa-f0-9]{6})|(#([A-Fa-f0-9]{6}))");
 
   static {
     colorMap.put("&0", "<reset><black>");
