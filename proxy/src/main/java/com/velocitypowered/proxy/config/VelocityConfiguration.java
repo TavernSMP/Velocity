@@ -779,7 +779,7 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean allowIllegalCharactersInChat = false;
     @Expose
-    private String serverBrand = "{0}";
+    private String serverBrand = "{0} ({1})";
     @Expose
     private String outdatedVersionPing = "{0} {1}";
 
@@ -807,7 +807,7 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.allowIllegalCharactersInChat = config.getOrElse("allow-illegal-characters-in-chat", false);
-        this.serverBrand = config.getOrElse("server-brand", "{0}");
+        this.serverBrand = config.getOrElse("server-brand", "{0} ({1})");
         this.outdatedVersionPing = config.getOrElse("outdated-version-ping", "{0} {1}");
       }
     }
