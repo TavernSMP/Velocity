@@ -130,17 +130,20 @@ public final class ServerCommand {
 
     final int connectedPlayers = server.getPlayersConnected().size();
     final TranslatableComponent.Builder playersTextComponent = Component.translatable();
+
     if (connectedPlayers == 1) {
       playersTextComponent.key("velocity.command.server-tooltip-player-online");
     } else {
       playersTextComponent.key("velocity.command.server-tooltip-players-online");
     }
     playersTextComponent.arguments(Component.text(connectedPlayers));
+
     if (serverInfo.getName().equals(currentPlayerServer)) {
       serverTextComponent.color(NamedTextColor.GREEN)
           .hoverEvent(
               showText(
-                  Component.translatable("velocity.command.server-tooltip-current-server")
+                  Component.empty()
+                      .append(Component.translatable("velocity.command.server-tooltip-current-server"))
                       .append(Component.newline())
                       .append(playersTextComponent))
           );
@@ -149,7 +152,8 @@ public final class ServerCommand {
           .clickEvent(ClickEvent.runCommand("/server " + serverInfo.getName()))
           .hoverEvent(
               showText(
-                  Component.translatable("velocity.command.server-tooltip-offer-connect-server")
+                  Component.empty()
+                      .append(Component.translatable("velocity.command.server-tooltip-offer-connect-server"))
                       .append(Component.newline())
                       .append(playersTextComponent))
           );

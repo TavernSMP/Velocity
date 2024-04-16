@@ -55,7 +55,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -207,20 +206,23 @@ public final class VelocityCommand {
         return Command.SINGLE_SUCCESS;
       }
 
-      final TextComponent.Builder listBuilder = Component.text();
+      Component component = Component.empty();
+
       for (int i = 0; i < pluginCount; i++) {
         final PluginContainer plugin = plugins.get(i);
-        listBuilder.append(componentForPlugin(plugin.getDescription()));
+
+        component = component.append(componentForPlugin(plugin.getDescription()));
+
         if (i + 1 < pluginCount) {
-          listBuilder.append(Component.text(", "));
+          component = component.append(Component.text(", "));
         }
       }
 
-      final TranslatableComponent output = Component.translatable()
-          .key("velocity.command.plugins-list")
-          .color(NamedTextColor.YELLOW)
-          .arguments(listBuilder.build())
-          .build();
+      final Component output = Component.empty()
+          .append(Component.translatable("velocity.command.plugins-list").color(NamedTextColor.YELLOW))
+          .appendSpace()
+          .append(component);
+
       source.sendMessage(output);
       return Command.SINGLE_SUCCESS;
     }
@@ -229,37 +231,33 @@ public final class VelocityCommand {
       final String pluginInfo = description.getName().orElse(description.getId())
           + description.getVersion().map(v -> " " + v).orElse("");
 
-      final TextComponent.Builder hoverText = Component.text().content(pluginInfo);
+      Component component = Component.empty().append(Component.text().content(pluginInfo));
 
-      description.getUrl().ifPresent(url -> {
-        hoverText.append(Component.newline());
-        hoverText.append(Component.translatable(
-            "velocity.command.plugin-tooltip-website",
-            Component.text(url)));
-      });
-      if (!description.getAuthors().isEmpty()) {
-        hoverText.append(Component.newline());
-        if (description.getAuthors().size() == 1) {
-          hoverText.append(Component.translatable("velocity.command.plugin-tooltip-author",
-              Component.text(description.getAuthors().get(0))));
-        } else {
-          hoverText.append(
-              Component.translatable("velocity.command.plugin-tooltip-author",
-                  Component.text(String.join(", ", description.getAuthors()))
-              )
-          );
-        }
+      if (description.getUrl().isPresent()) {
+        component = component
+            .append(Component.newline())
+            .append(Component.empty().append(Component.translatable(
+                "velocity.command.plugin-tooltip-website",
+                Component.text(description.getUrl().get()))));
       }
-      description.getDescription().ifPresent(pdesc -> {
-        hoverText.append(Component.newline());
-        hoverText.append(Component.newline());
-        hoverText.append(Component.text(pdesc));
-      });
+
+      if (!description.getAuthors().isEmpty()) {
+        component = component
+            .append(Component.newline())
+            .append(Component.translatable("velocity.command.plugin-tooltip-author", Component.text(description.getAuthors().get(0))));
+      }
+
+      if (description.getDescription().isPresent()) {
+        component = component
+            .append(Component.newline())
+            .append(Component.newline())
+            .append(Component.text(description.getDescription().get()));
+      }
 
       return Component.text()
               .content(description.getId())
               .color(NamedTextColor.GRAY)
-              .hoverEvent(HoverEvent.showText(hoverText.build()))
+              .hoverEvent(HoverEvent.showText(component))
               .build();
     }
   }
