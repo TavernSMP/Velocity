@@ -242,9 +242,15 @@ public final class VelocityCommand {
       }
 
       if (!description.getAuthors().isEmpty()) {
+        final List<String> authors = description.getAuthors();
+        final boolean multiple = authors.size() > 1;
+        final String key = multiple ?
+                           "velocity.command.plugin-tooltip-authors" :
+                           "velocity.command.plugin-tooltip-author";
+
         component = component
             .append(Component.newline())
-            .append(Component.translatable("velocity.command.plugin-tooltip-author", Component.text(description.getAuthors().get(0))));
+            .append(Component.translatable(key, Component.text(String.join(", ", authors))));
       }
 
       if (description.getDescription().isPresent()) {
