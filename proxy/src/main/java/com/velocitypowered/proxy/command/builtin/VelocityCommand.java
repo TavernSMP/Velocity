@@ -207,12 +207,9 @@ public final class VelocityCommand {
       }
 
       Component component = Component.empty();
-
       for (int i = 0; i < pluginCount; i++) {
         final PluginContainer plugin = plugins.get(i);
-
         component = component.append(componentForPlugin(plugin.getDescription()));
-
         if (i + 1 < pluginCount) {
           component = component.append(Component.text(", "));
         }
@@ -222,7 +219,6 @@ public final class VelocityCommand {
           .append(Component.translatable("velocity.command.plugins-list").color(NamedTextColor.YELLOW))
           .appendSpace()
           .append(component);
-
       source.sendMessage(output);
       return Command.SINGLE_SUCCESS;
     }

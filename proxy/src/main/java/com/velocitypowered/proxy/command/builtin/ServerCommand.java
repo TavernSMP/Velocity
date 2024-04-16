@@ -130,14 +130,12 @@ public final class ServerCommand {
 
     final int connectedPlayers = server.getPlayersConnected().size();
     final TranslatableComponent.Builder playersTextComponent = Component.translatable();
-
     if (connectedPlayers == 1) {
       playersTextComponent.key("velocity.command.server-tooltip-player-online");
     } else {
       playersTextComponent.key("velocity.command.server-tooltip-players-online");
     }
     playersTextComponent.arguments(Component.text(connectedPlayers));
-
     if (serverInfo.getName().equals(currentPlayerServer)) {
       serverTextComponent.color(NamedTextColor.GREEN)
           .hoverEvent(
