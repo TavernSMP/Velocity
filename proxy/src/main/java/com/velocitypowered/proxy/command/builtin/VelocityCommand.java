@@ -244,9 +244,9 @@ public final class VelocityCommand {
       if (!description.getAuthors().isEmpty()) {
         final List<String> authors = description.getAuthors();
         final boolean multiple = authors.size() > 1;
-        final String key = multiple ?
-                           "velocity.command.plugin-tooltip-authors" :
-                           "velocity.command.plugin-tooltip-author";
+        final String key = multiple
+                           ? "velocity.command.plugin-tooltip-authors"
+                           : "velocity.command.plugin-tooltip-author";
 
         component = component
             .append(Component.newline())
