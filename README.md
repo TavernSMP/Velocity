@@ -24,7 +24,7 @@ Velocity-CTD is licensed under the GPLv3 license.
 
 * Configurable `/alert` command sends messages across your entire network.
 * Configurable `/find` command that locates yourself and other users.
-* `/hub` with `/lobby` alias that sends you to the or a fallback server,
+* `/hub` with `/lobby` alias that sends you to the/a fallback server,
   which synchronizes with the activation and deactivation of dynamic fallbacks.
 * Configurable `/ping` command that displays your and other users' ping.
 * The `/send` supports sending users from `{SERVER_FROM}` to `{SERVER_TO}`.
@@ -44,7 +44,7 @@ Velocity-CTD is licensed under the GPLv3 license.
 * Preliminary MiniMessage support to permit full configurability of all Velocity
   messages.
 * Removal of all language files except `messages.properties` to preserve
-  maintainability. PR's are welcome to reimplement all language files
+  maintainability. PRs are welcome to reimplement all language files
   with our changes.
 
 ## Building
@@ -60,5 +60,5 @@ where our latest updates will be compiled and ready for use.
 ## Running
 
 Once you've built Velocity, you can copy and run the `-all` JAR from
-`proxy/build/libs`. Velocity will generate a default configuration file
+`proxy/build/libs`. Velocity will generate a default configuration file,
 and you can configure it from there.
