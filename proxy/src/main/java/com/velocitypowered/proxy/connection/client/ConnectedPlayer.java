@@ -373,7 +373,6 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   public Component translateMessage(Component message) {
     Locale locale = ClosestLocaleMatcher.INSTANCE
         .lookupClosest(getEffectiveLocale() == null ? Locale.getDefault() : getEffectiveLocale());
-
     return GlobalTranslator.render(message, locale);
   }
 
