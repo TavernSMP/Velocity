@@ -74,21 +74,26 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.http.HttpClient;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.PrivilegedAction;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -320,7 +325,20 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
                       ? Locale.US
                       : Locale.forLanguageTag(localeName);
 
-              translationRegistry.registerAll(locale, file, false);
+              try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                final ResourceBundle bundle = new PropertyResourceBundle(reader);
+
+                translationRegistry.registerAll(locale, bundle.keySet(), key -> {
+                  final String format = bundle.getString(key);
+                  final String escapedFormat = format.replace("'", "''");
+                  final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
+
+                  return messageFormat;
+                });
+              } catch (final IOException e) {
+                // ignored
+              }
+
               ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
             });
           }

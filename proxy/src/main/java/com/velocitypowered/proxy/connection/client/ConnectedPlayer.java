@@ -112,6 +112,7 @@ import net.kyori.adventure.resource.ResourcePackInfoLike;
 import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.resource.ResourcePackRequestLike;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -372,6 +373,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   public Component translateMessage(Component message) {
     Locale locale = ClosestLocaleMatcher.INSTANCE
         .lookupClosest(getEffectiveLocale() == null ? Locale.getDefault() : getEffectiveLocale());
+
     return GlobalTranslator.render(message, locale);
   }
 
@@ -389,7 +391,8 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     Preconditions.checkNotNull(message, "message");
     Preconditions.checkNotNull(type, "type");
 
-    Component translated = translateMessage(message);
+    Component translated = translateMessage(message)
+        .replaceText(TextReplacementConfig.builder().match("''").replacement("'").build());
 
     connection.write(getChatBuilderFactory().builder()
         .component(translated).forIdentity(identity)
