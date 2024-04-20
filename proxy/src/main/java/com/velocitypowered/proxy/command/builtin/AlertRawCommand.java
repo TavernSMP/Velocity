@@ -34,9 +34,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 /**
- * Implements Velocity's {@code /alert} command.
+ * Implements Velocity's {@code /alertraw} command.
  */
-public class AlertCommand {
+public class AlertRawCommand {
 
   private final ProxyServer server;
   private static final Map<String, String> colorMap = new HashMap<>();
@@ -68,7 +68,7 @@ public class AlertCommand {
     colorMap.put("\\n", "<newline>");
   }
 
-  public AlertCommand(ProxyServer server) {
+  public AlertRawCommand(ProxyServer server) {
     this.server = server;
   }
 
@@ -77,9 +77,9 @@ public class AlertCommand {
    */
   public void register() {
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
-        .literalArgumentBuilder("alert")
+        .literalArgumentBuilder("alertraw")
         .requires(source ->
-            source.getPermissionValue("velocity.command.alert") == Tristate.TRUE)
+            source.getPermissionValue("velocity.command.alertraw") == Tristate.TRUE)
         .executes(this::usage)
         .then(BrigadierCommand
             .requiredArgumentBuilder("message", StringArgumentType.greedyString())
@@ -89,7 +89,7 @@ public class AlertCommand {
 
   private int usage(final CommandContext<CommandSource> context) {
     context.getSource().sendMessage(
-        Component.translatable("velocity.command.alert.usage", NamedTextColor.YELLOW)
+        Component.translatable("velocity.command.alertraw.usage", NamedTextColor.YELLOW)
     );
     return Command.SINGLE_SUCCESS;
   }
@@ -98,7 +98,7 @@ public class AlertCommand {
     String message = StringArgumentType.getString(context, "message");
     if (message.isEmpty()) {
       context.getSource().sendMessage(
-          Component.translatable("velocity.command.alert.no-message", NamedTextColor.YELLOW)
+          Component.translatable("velocity.command.alertraw.no-message", NamedTextColor.YELLOW)
       );
       return 0;
     }
@@ -123,7 +123,7 @@ public class AlertCommand {
     matcher.appendTail(sb);
     message = sb.toString();
 
-    server.sendMessage(Component.translatable("velocity.command.alert.message", NamedTextColor.WHITE,
+    server.sendMessage(Component.translatable("velocity.command.alertraw.message", NamedTextColor.WHITE,
             MiniMessage.miniMessage().deserialize(message)));
 
     return Command.SINGLE_SUCCESS;

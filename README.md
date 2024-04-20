@@ -23,6 +23,8 @@ Velocity-CTD is licensed under the GPLv3 license.
 ## Additional Features/Removals
 
 * Configurable `/alert` command sends messages across your entire network.
+* Configurable `/alertraw` command to send non-prefixed messages across your
+  entire network.
 * Configurable `/find` command that locates yourself and other users.
 * `/hub` with `/lobby` alias that sends you to the/a fallback server,
   which synchronizes with the activation and deactivation of dynamic fallbacks.
