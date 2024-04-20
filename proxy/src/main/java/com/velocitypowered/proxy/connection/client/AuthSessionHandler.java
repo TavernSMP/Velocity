@@ -103,7 +103,7 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
 
       componentLogger.info(Component.text(discMessage).append(
               Component.translatable("velocity.error.modern-forwarding-needs-new-client", NamedTextColor.RED)
-                      .arguments(Component.text(minimumVersion))));
+                      .arguments(Component.text(minimumVersion), Component.text(ProtocolVersion.MAXIMUM_VERSION.getVersionIntroducedIn()))));
       return;
     }
 
@@ -152,13 +152,15 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
 
   private boolean versionCheck(MinecraftConnection connection) {
     final ProtocolVersion minimumProtocolVersion = ProtocolVersion.getVersionByName(minimumVersion);
+    final ProtocolVersion maximumProtocolVersion = ProtocolVersion.MAXIMUM_VERSION;
     final String clientProtocolVersion = connection.getProtocolVersion().getVersionIntroducedIn();
 
     // Compare the client's protocol version with the minimum required version
-    if (ProtocolVersion.getVersionByName(clientProtocolVersion).lessThan(minimumProtocolVersion)) {
+    if (ProtocolVersion.getVersionByName(clientProtocolVersion).lessThan(minimumProtocolVersion)
+            || (ProtocolVersion.getVersionByName(clientProtocolVersion).greaterThan(maximumProtocolVersion))) {
       // Disconnect the player with an error message if client version is too low
       this.inbound.disconnect(Component.translatable("velocity.error.modern-forwarding-needs-new-client", NamedTextColor.RED)
-              .arguments(Component.text(minimumVersion)));
+              .arguments(Component.text(minimumVersion), Component.text(ProtocolVersion.MAXIMUM_VERSION.getVersionIntroducedIn())));
       return false;
     }
 
