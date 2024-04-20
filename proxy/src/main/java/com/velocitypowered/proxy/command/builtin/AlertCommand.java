@@ -27,8 +27,6 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -40,7 +38,6 @@ public class AlertCommand {
 
   private final ProxyServer server;
   private static final Map<String, String> colorMap = new HashMap<>();
-  private static final Pattern symbolTranslator = Pattern.compile("(&#[A-Fa-f0-9]{6})|(#([A-Fa-f0-9]{6}))");
 
   static {
     colorMap.put("&0", "<reset><black>");
@@ -103,25 +100,21 @@ public class AlertCommand {
       return 0;
     }
 
+    boolean isAngleBracketFormat = message.contains("<");
+
     message = message.replace("§", "&");
 
     for (Map.Entry<String, String> entry : colorMap.entrySet()) {
       message = message.replace(entry.getKey(), entry.getValue());
     }
 
-    for (String s : colorMap.keySet()) {
-      message = message.replace(s, colorMap.get(s));
+    if (!isAngleBracketFormat) {
+      message = message.replaceAll("([&#][A-Fa-f0-9]{6})", "<$1>");
     }
 
-    Matcher matcher = symbolTranslator.matcher(message);
-    StringBuilder sb = new StringBuilder();
-    while (matcher.find()) {
-      String match = matcher.group();
-      String replacement = "<" + match.replace("&", "") + ">";
-      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-    }
-    matcher.appendTail(sb);
-    message = sb.toString();
+    message = message.replaceAll("([^<]|^)<(?:#|&#)([A-Fa-f0-9]{6})>", "$1<reset><#$2>");
+
+    message = message.replace("&", "");
 
     server.sendMessage(Component.translatable("velocity.command.alert.message", NamedTextColor.WHITE,
             MiniMessage.miniMessage().deserialize(message)));
