@@ -86,8 +86,6 @@ public class VelocityEventManager implements EventManager {
   private static final LambdaType<WithContinuationHandler> untargetedWithContinuationHandlerType =
       LambdaType.of(WithContinuationHandler.class);
 
-  private static final HandlersCache withoutHandlers =
-      new HandlersCache(new HandlerRegistration[0]);
   private static final Comparator<HandlerRegistration> handlerComparator =
       Comparator.comparingInt(o -> o.order);
 
@@ -189,10 +187,6 @@ public class VelocityEventManager implements EventManager {
       }
     } finally {
       lock.readLock().unlock();
-    }
-
-    if (baked.isEmpty()) {
-      return withoutHandlers;
     }
 
     baked.sort(handlerComparator);
