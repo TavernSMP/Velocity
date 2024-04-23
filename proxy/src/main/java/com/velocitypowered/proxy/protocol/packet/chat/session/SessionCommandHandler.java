@@ -46,7 +46,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
     queueCommandResult(this.server, this.player, event -> {
       CommandExecuteEvent.CommandResult result = event.getResult();
       if (result == CommandExecuteEvent.CommandResult.denied()) {
-        if (packet.isSigned()) {
+        if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
           logger.fatal("A plugin tried to deny a command with signable component(s). "
               + "This is not supported. "
               + "Disconnecting player " + player.getUsername() + ". Command packet: " + packet);
@@ -55,7 +55,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
                   + "Contact your network administrator."));
         }
         // We seemingly can't actually do this if signed args exist, if not, we can probs keep stuff happy
-        if (player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
+        if (server.getConfiguration().enforceChatSigning() && player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
           return CompletableFuture.completedFuture(new ChatAcknowledgementPacket(packet.lastSeenMessages.getOffset()));
         }
         return CompletableFuture.completedFuture(null);
@@ -66,7 +66,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
         if (packet.isSigned() && commandToRun.equals(packet.command)) {
           return CompletableFuture.completedFuture(packet);
         } else {
-          if (packet.isSigned()) {
+          if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
             logger.fatal("A plugin tried to change a command with signed component(s). "
                 + "This is not supported. "
                 + "Disconnecting player " + player.getUsername() + ". Command packet: " + packet);
@@ -90,7 +90,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
           if (packet.isSigned() && commandToRun.equals(packet.command)) {
             return packet;
           } else {
-            if (packet.isSigned()) {
+            if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
               logger.fatal("A plugin tried to change a command with signed component(s). "
                   + "This is not supported. "
                   + "Disconnecting player " + player.getUsername() + ". Command packet: " + packet);
@@ -108,7 +108,8 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
                 .toServer();
           }
         }
-        if (player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3) && packet.lastSeenMessages != null) {
+        if (server.getConfiguration().enforceChatSigning() &&
+            player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3) && packet.lastSeenMessages != null) {
           return new ChatAcknowledgementPacket(packet.lastSeenMessages.getOffset());
         }
         return null;

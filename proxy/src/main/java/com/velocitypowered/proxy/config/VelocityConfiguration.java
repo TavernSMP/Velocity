@@ -29,6 +29,7 @@ import com.velocitypowered.api.util.Favicon;
 import com.velocitypowered.proxy.config.migration.ConfigurationMigration;
 import com.velocitypowered.proxy.config.migration.ForwardingMigration;
 import com.velocitypowered.proxy.config.migration.KeyAuthenticationMigration;
+import com.velocitypowered.proxy.config.migration.MiniMessageTranslationsMigration;
 import com.velocitypowered.proxy.config.migration.MotdMigration;
 import com.velocitypowered.proxy.config.migration.TransferIntegrationMigration;
 import com.velocitypowered.proxy.util.AddressUtil;
@@ -91,6 +92,14 @@ public class VelocityConfiguration implements ProxyConfig {
   private @Nullable Favicon favicon;
   @Expose
   private boolean forceKeyAuthentication = true; // Added in 1.19
+  @Expose
+  private boolean logOfflineConnections = true;
+  @Expose
+  private boolean disableForge = false;
+  @Expose
+  private boolean enforceChatSigning = true;
+  @Expose
+  private String minimumVersion = "1.7.2";
 
   private VelocityConfiguration(Servers servers, ForcedHosts forcedHosts, Advanced advanced,
       Query query, Metrics metrics) {
@@ -106,7 +115,8 @@ public class VelocityConfiguration implements ProxyConfig {
       PlayerInfoForwarding playerInfoForwardingMode, byte[] forwardingSecret,
       boolean onlineModeKickExistingPlayers, PingPassthroughMode pingPassthrough,
       boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
-      Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication) {
+      Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
+      boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning, String minimumVersion) {
     this.bind = bind;
     this.motd = motd;
     this.showMaxPlayers = showMaxPlayers;
@@ -124,6 +134,10 @@ public class VelocityConfiguration implements ProxyConfig {
     this.query = query;
     this.metrics = metrics;
     this.forceKeyAuthentication = forceKeyAuthentication;
+    this.logOfflineConnections = logOfflineConnections;
+    this.disableForge = disableForge;
+    this.enforceChatSigning = enforceChatSigning;
+    this.minimumVersion = minimumVersion;
   }
 
   /**
@@ -403,6 +417,22 @@ public class VelocityConfiguration implements ProxyConfig {
     return this.advanced.isAcceptTransfers();
   }
 
+  public boolean isAllowIllegalCharactersInChat() {
+    return advanced.isAllowIllegalCharactersInChat();
+  }
+
+  public String getServerBrand() {
+    return advanced.getServerBrand();
+  }
+
+  public String getOutdatedServerPing() {
+    return advanced.getOutdatedVersionPing();
+  }
+
+  public boolean isEnableDynamicFallbacks() {
+    return servers.isEnableDynamicFallbacks();
+  }
+
   public boolean isForceKeyAuthentication() {
     return forceKeyAuthentication;
   }
@@ -424,6 +454,10 @@ public class VelocityConfiguration implements ProxyConfig {
         .add("favicon", favicon)
         .add("enablePlayerAddressLogging", enablePlayerAddressLogging)
         .add("forceKeyAuthentication", forceKeyAuthentication)
+        .add("logOfflineConnections", logOfflineConnections)
+        .add("disableForge", disableForge)
+        .add("enforceChatSigning", enforceChatSigning)
+        .add("minimumVersion", minimumVersion)
         .toString();
   }
 
@@ -462,6 +496,7 @@ public class VelocityConfiguration implements ProxyConfig {
           new ForwardingMigration(),
           new KeyAuthenticationMigration(),
           new MotdMigration(),
+          new MiniMessageTranslationsMigration(),
           new TransferIntegrationMigration()
       };
 
@@ -513,6 +548,12 @@ public class VelocityConfiguration implements ProxyConfig {
       final boolean kickExisting = config.getOrElse("kick-existing-players", false);
       final boolean enablePlayerAddressLogging = config.getOrElse(
               "enable-player-address-logging", true);
+      final boolean logOfflineConnections = config.getOrElse(
+                   "log-offline-connections", false);
+      final boolean disableForge = config.getOrElse("disable-forge", true);
+      final boolean enforceChatSigning = config.getOrElse(
+          "enforce-chat-signing", false);
+      final String minimumVersion = config.getOrElse("minimum-version", "1.7.2");
 
       // Throw an exception if the forwarding-secret file is empty and the proxy is using a
       // forwarding mode that requires it.
@@ -539,7 +580,11 @@ public class VelocityConfiguration implements ProxyConfig {
               new Advanced(advancedConfig),
               new Query(queryConfig),
               new Metrics(metricsConfig),
-              forceKeyAuthentication
+              forceKeyAuthentication,
+              logOfflineConnections,
+              disableForge,
+              enforceChatSigning,
+              minimumVersion
       );
     }
   }
@@ -564,6 +609,22 @@ public class VelocityConfiguration implements ProxyConfig {
     return onlineModeKickExistingPlayers;
   }
 
+  public boolean isLogOfflineConnections() {
+    return logOfflineConnections;
+  }
+
+  public boolean isDisableForge() {
+    return disableForge;
+  }
+
+  public boolean enforceChatSigning() {
+    return enforceChatSigning;
+  }
+
+  public String getMinimumVersion() {
+    return minimumVersion;
+  }
+
   private static class Servers {
 
     private Map<String, String> servers = ImmutableMap.of(
@@ -572,6 +633,8 @@ public class VelocityConfiguration implements ProxyConfig {
         "minigames", "127.0.0.1:30068"
     );
     private List<String> attemptConnectionOrder = ImmutableList.of("lobby");
+
+    private boolean enableDynamicFallbacks = false;
 
     private Servers() {
     }
@@ -583,7 +646,7 @@ public class VelocityConfiguration implements ProxyConfig {
           if (entry.getValue() instanceof String) {
             servers.put(cleanServerName(entry.getKey()), entry.getValue());
           } else {
-            if (!entry.getKey().equalsIgnoreCase("try")) {
+            if (!entry.getKey().equalsIgnoreCase("try") && !entry.getKey().equalsIgnoreCase("enable-dynamic-fallbacks")) {
               throw new IllegalArgumentException(
                   "Server entry " + entry.getKey() + " is not a string!");
             }
@@ -591,6 +654,7 @@ public class VelocityConfiguration implements ProxyConfig {
         }
         this.servers = ImmutableMap.copyOf(servers);
         this.attemptConnectionOrder = config.getOrElse("try", attemptConnectionOrder);
+        this.enableDynamicFallbacks = config.getOrElse("enable-dynamic-fallbacks", false);
       }
     }
 
@@ -609,6 +673,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
     public List<String> getAttemptConnectionOrder() {
       return attemptConnectionOrder;
+    }
+
+    public boolean isEnableDynamicFallbacks() {
+      return enableDynamicFallbacks;
     }
 
     public void setAttemptConnectionOrder(List<String> attemptConnectionOrder) {
@@ -716,6 +784,12 @@ public class VelocityConfiguration implements ProxyConfig {
     private boolean logPlayerConnections = true;
     @Expose
     private boolean acceptTransfers = false;
+    @Expose
+    private boolean allowIllegalCharactersInChat = false;
+    @Expose
+    private String serverBrand = "{0} ({1})";
+    @Expose
+    private String outdatedVersionPing = "{0} {1}";
 
     private Advanced() {
     }
@@ -741,6 +815,9 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
+        this.allowIllegalCharactersInChat = config.getOrElse("allow-illegal-characters-in-chat", false);
+        this.serverBrand = config.getOrElse("server-brand", "{0} ({1})");
+        this.outdatedVersionPing = config.getOrElse("outdated-version-ping", "{0} {1}");
       }
     }
 
@@ -804,6 +881,14 @@ public class VelocityConfiguration implements ProxyConfig {
       return this.acceptTransfers;
     }
 
+    public boolean isAllowIllegalCharactersInChat() {
+      return allowIllegalCharactersInChat;
+    }
+
+    public String getServerBrand() {
+      return serverBrand;
+    }
+
     @Override
     public String toString() {
       return "Advanced{"
@@ -821,7 +906,12 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", logCommandExecutions=" + logCommandExecutions
           + ", logPlayerConnections=" + logPlayerConnections
           + ", acceptTransfers=" + acceptTransfers
+          + ", allowIllegalCharactersInChat=" + allowIllegalCharactersInChat
           + '}';
+    }
+
+    public String getOutdatedVersionPing() {
+      return this.outdatedVersionPing;
     }
   }
 
