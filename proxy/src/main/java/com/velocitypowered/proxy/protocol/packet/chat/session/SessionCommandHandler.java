@@ -109,7 +109,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
           }
         }
         if (server.getConfiguration().enforceChatSigning() &&
-            player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
+            player.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3) && packet.lastSeenMessages != null) {
           return new ChatAcknowledgementPacket(packet.lastSeenMessages.getOffset());
         }
         return null;

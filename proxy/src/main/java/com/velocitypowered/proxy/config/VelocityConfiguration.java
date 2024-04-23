@@ -31,6 +31,7 @@ import com.velocitypowered.proxy.config.migration.ForwardingMigration;
 import com.velocitypowered.proxy.config.migration.KeyAuthenticationMigration;
 import com.velocitypowered.proxy.config.migration.MiniMessageTranslationsMigration;
 import com.velocitypowered.proxy.config.migration.MotdMigration;
+import com.velocitypowered.proxy.config.migration.TransferIntegrationMigration;
 import com.velocitypowered.proxy.util.AddressUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -412,6 +413,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.isLogPlayerConnections();
   }
 
+  public boolean isAcceptTransfers() {
+    return this.advanced.isAcceptTransfers();
+  }
+
   public boolean isAllowIllegalCharactersInChat() {
     return advanced.isAllowIllegalCharactersInChat();
   }
@@ -491,7 +496,8 @@ public class VelocityConfiguration implements ProxyConfig {
           new ForwardingMigration(),
           new KeyAuthenticationMigration(),
           new MotdMigration(),
-          new MiniMessageTranslationsMigration()
+          new MiniMessageTranslationsMigration(),
+          new TransferIntegrationMigration()
       };
 
       for (final ConfigurationMigration migration : migrations) {
@@ -777,6 +783,8 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean logPlayerConnections = true;
     @Expose
+    private boolean acceptTransfers = false;
+    @Expose
     private boolean allowIllegalCharactersInChat = false;
     @Expose
     private String serverBrand = "{0} ({1})";
@@ -806,6 +814,7 @@ public class VelocityConfiguration implements ProxyConfig {
         this.announceProxyCommands = config.getOrElse("announce-proxy-commands", true);
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
+        this.acceptTransfers = config.getOrElse("accepts-transfers", false);
         this.allowIllegalCharactersInChat = config.getOrElse("allow-illegal-characters-in-chat", false);
         this.serverBrand = config.getOrElse("server-brand", "{0} ({1})");
         this.outdatedVersionPing = config.getOrElse("outdated-version-ping", "{0} {1}");
@@ -868,6 +877,10 @@ public class VelocityConfiguration implements ProxyConfig {
       return logPlayerConnections;
     }
 
+    public boolean isAcceptTransfers() {
+      return this.acceptTransfers;
+    }
+
     public boolean isAllowIllegalCharactersInChat() {
       return allowIllegalCharactersInChat;
     }
@@ -892,6 +905,7 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", announceProxyCommands=" + announceProxyCommands
           + ", logCommandExecutions=" + logCommandExecutions
           + ", logPlayerConnections=" + logPlayerConnections
+          + ", acceptTransfers=" + acceptTransfers
           + ", allowIllegalCharactersInChat=" + allowIllegalCharactersInChat
           + '}';
     }

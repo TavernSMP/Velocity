@@ -158,6 +158,10 @@ log-command-executions = false
 # and disconnecting from the proxy.
 log-player-connections = true
 
+# Allows players transferred from other hosts via the
+# Transfer packet (Minecraft 1.20.5) to be received.
+accepts-transfers = false
+
 # Enables the execution of illegal characters in chat and only allows
 # or denies illegal characters that are executed through the proxy.
 allow-illegal-characters-in-chat = false
