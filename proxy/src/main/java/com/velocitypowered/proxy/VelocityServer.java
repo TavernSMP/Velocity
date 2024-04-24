@@ -83,9 +83,7 @@ import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessController;
 import java.security.KeyPair;
-import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -552,8 +550,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
           // makes sure that all the disconnect events are being fired
 
           CompletableFuture<Void> playersTeardownFuture = CompletableFuture.allOf(players.stream()
-              .map(ConnectedPlayer::getTeardownFuture)
-              .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
+                  .map(ConnectedPlayer::getTeardownFuture)
+                  .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
 
           playersTeardownFuture.get(10, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -582,14 +580,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       shutdown = true;
 
       if (explicitExit) {
-        AccessController.doPrivileged(new PrivilegedAction<Void>() {
-          @Override
-          @SuppressFBWarnings("DM_EXIT")
-          public Void run() {
-            System.exit(0);
-            return null;
-          }
-        });
+        System.exit(0);
       }
     };
 
