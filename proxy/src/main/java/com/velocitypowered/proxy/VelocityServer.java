@@ -331,7 +331,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
                 translationRegistry.registerAll(locale, bundle.keySet(), key -> {
                   final String format = bundle.getString(key);
                   final String escapedFormat = format.replace("'", "''");
-                  final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
+                  final MessageFormat messageFormat;
+                  messageFormat = new MessageFormat(escapedFormat, locale);
 
                   return messageFormat;
                 });
