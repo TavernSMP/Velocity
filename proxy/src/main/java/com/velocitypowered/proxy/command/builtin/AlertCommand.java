@@ -114,7 +114,7 @@ public class AlertCommand {
 
     message = message.replaceAll("([^<]|^)<(?:#|&#)([A-Fa-f0-9]{6})>", "$1<reset><#$2>");
 
-    message = message.replace("&", "");
+    message = message.replaceAll("(?<![^&])&(?![^&])", "<reset>");
 
     server.sendMessage(Component.translatable("velocity.command.alert.message", NamedTextColor.WHITE,
             MiniMessage.miniMessage().deserialize(message)));
