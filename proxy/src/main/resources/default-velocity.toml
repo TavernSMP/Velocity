@@ -6,7 +6,7 @@ bind = "0.0.0.0:25577"
 
 # What should be the MOTD? This gets displayed when the player adds your server to
 # their server list. Only MiniMessage format is accepted.
-motd = "<#09add3>A Velocity Server"
+motd = "<#ff3a4c>A Velocity Server"
 
 # What should we display for the maximum number of players? (Velocity does not support a cap
 # on the number of players online.)
@@ -14,6 +14,13 @@ show-max-players = 500
 
 # Should we authenticate players with Mojang? By default, this is on.
 online-mode = true
+
+# Whether chat signing should be enforced. If disabled, backend servers MUST disable chat signing.
+enforce-chat-signing = true
+
+# Modify the minimum version, so the proxy blocks out users on the wrong version, rather than the backend server.
+# Modern forwarding supports 1.13, at minimum. Set this to 1.13 or above if you are using modern forwarding.
+minimum-version = "1.7.2"
 
 # Should the proxy enforce the new public key security standard? By default, this is on.
 force-key-authentication = true
@@ -47,6 +54,9 @@ forwarding-secret-file = "forwarding.secret"
 # instead for a nicer display in the server list.
 announce-forge = false
 
+# If true, disables handling of inbound Forge handshakes.
+disable-forge = false
+
 # If enabled (default is false) and the proxy is in online mode, Velocity will kick
 # any existing player who is online if a duplicate connection attempt is made.
 kick-existing-players = false
@@ -69,6 +79,9 @@ ping-passthrough = "DISABLED"
 # If not enabled (default is true) player IP addresses will be replaced by <ip address withheld> in logs
 enable-player-address-logging = true
 
+# If false, disables logging for offline player connections.
+log-offline-connections = true
+
 [servers]
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
@@ -80,6 +93,10 @@ minigames = "127.0.0.1:30068"
 try = [
     "lobby"
 ]
+
+# Sends you to the least populated fallback server, instead of the first available fallback server.
+# Keep this false if you only have one fallback server.
+enable-dynamic-fallbacks = false
 
 [forced-hosts]
 # Configure your forced hosts here.
@@ -144,6 +161,16 @@ log-player-connections = true
 # Allows players transferred from other hosts via the
 # Transfer packet (Minecraft 1.20.5) to be received.
 accepts-transfers = false
+
+# Enables the execution of illegal characters in chat and only allows
+# or denies illegal characters that are executed through the proxy.
+allow-illegal-characters-in-chat = false
+
+# Modifies the server brand that displays in your debug menu.
+server-brand = "{0} ({1})"
+
+# Modifies the outdated server brand that displays in your server menu.
+outdated-server-ping = "{0} {1}"
 
 [query]
 # Whether to enable responding to GameSpy 4 query responses or not.

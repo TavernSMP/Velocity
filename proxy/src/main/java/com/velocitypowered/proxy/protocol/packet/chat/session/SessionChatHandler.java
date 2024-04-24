@@ -56,7 +56,7 @@ public class SessionChatHandler implements ChatHandler<SessionPlayerChatPacket> 
             .thenApply(pme -> {
               PlayerChatEvent.ChatResult chatResult = pme.getResult();
               if (!chatResult.isAllowed()) {
-                if (packet.isSigned()) {
+                if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
                   invalidCancel(logger, player);
                 }
                 return null;
@@ -64,7 +64,7 @@ public class SessionChatHandler implements ChatHandler<SessionPlayerChatPacket> 
 
               if (chatResult.getMessage().map(str -> !str.equals(packet.getMessage()))
                   .orElse(false)) {
-                if (packet.isSigned()) {
+                if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
                   invalidChange(logger, player);
                   return null;
                 }

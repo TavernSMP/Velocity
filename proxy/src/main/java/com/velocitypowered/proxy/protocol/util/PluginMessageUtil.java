@@ -28,6 +28,7 @@ import com.velocitypowered.proxy.protocol.packet.PluginMessagePacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -127,17 +128,19 @@ public final class PluginMessageUtil {
    *
    * @param message the plugin message
    * @param version the proxy version
+   * @param brand the initial brand format
    * @return the rewritten plugin message
    */
   public static PluginMessagePacket rewriteMinecraftBrand(PluginMessagePacket message,
                                                           ProxyVersion version,
-                                                          ProtocolVersion protocolVersion) {
+                                                          ProtocolVersion protocolVersion,
+                                                          String brand) {
     checkNotNull(message, "message");
     checkNotNull(version, "version");
     checkArgument(isMcBrand(message), "message is not a brand plugin message");
 
     String currentBrand = readBrandMessage(message.content());
-    String rewrittenBrand = String.format("%s (%s)", currentBrand, version.getName());
+    String rewrittenBrand = MessageFormat.format(brand, currentBrand, version.getName());
 
     ByteBuf rewrittenBuf = Unpooled.buffer();
     if (protocolVersion.noLessThan(ProtocolVersion.MINECRAFT_1_8)) {
