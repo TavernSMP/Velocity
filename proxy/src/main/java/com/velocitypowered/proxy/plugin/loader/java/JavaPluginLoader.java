@@ -38,6 +38,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -90,7 +92,8 @@ public class JavaPluginLoader implements PluginLoader {
     URL pluginJarUrl = candidate.getSource().orElseThrow(
         () -> new InvalidPluginException("Description provided does not have a source path")
     ).toUri().toURL();
-    PluginClassLoader loader = new PluginClassLoader(new URL[]{pluginJarUrl});
+    PluginClassLoader loader = AccessController.doPrivileged(
+        (PrivilegedAction<PluginClassLoader>) () -> new PluginClassLoader(new URL[]{pluginJarUrl}));
     loader.addToClassloaders();
 
     JavaVelocityPluginDescriptionCandidate candidateInst =
