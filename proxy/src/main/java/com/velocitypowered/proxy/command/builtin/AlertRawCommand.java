@@ -40,6 +40,7 @@ public class AlertRawCommand {
   private static final Map<String, String> colorMap = new HashMap<>();
 
   static {
+    colorMap.put("§", "&");
     colorMap.put("&0", "<reset><black>");
     colorMap.put("&1", "<reset><dark_blue>");
     colorMap.put("&2", "<reset><dark_green>");
@@ -100,21 +101,19 @@ public class AlertRawCommand {
       return 0;
     }
 
-    boolean isAngleBracketFormat = message.contains("<");
-
-    message = message.replace("§", "&");
-
     for (Map.Entry<String, String> entry : colorMap.entrySet()) {
       message = message.replace(entry.getKey(), entry.getValue());
     }
 
-    if (!isAngleBracketFormat) {
-      message = message.replaceAll("([&#][A-Fa-f0-9]{6})", "<$1>");
-    }
+    boolean isAngleBracketFormat = message.contains("<");
+
+    message = message.replaceAll("&(#[A-Fa-f0-9]{6})", "$1");
 
     message = message.replaceAll("([^<]|^)<(?:#|&#)([A-Fa-f0-9]{6})>", "$1<reset><#$2>");
 
-    message = message.replaceAll("(?<![^&])&(?![^&])", "<reset>");
+    if (!isAngleBracketFormat) {
+      message = message.replaceAll("([&#][A-Fa-f0-9]{6})", "<$1>");
+    }
 
     server.sendMessage(Component.translatable("velocity.command.alertraw.message", NamedTextColor.WHITE,
             MiniMessage.miniMessage().deserialize(message)));
