@@ -236,19 +236,19 @@ public final class VelocityCommand {
       description.getUrl().ifPresent(url -> {
         hoverText.append(Component.newline());
         hoverText.append(Component.translatable(
-                "velocity.command.plugin-tooltip-website",
-                Component.text(url)));
+            "velocity.command.plugin-tooltip-website",
+            Component.text(url)));
       });
       if (!description.getAuthors().isEmpty()) {
         hoverText.append(Component.newline());
         if (description.getAuthors().size() == 1) {
           hoverText.append(Component.translatable("velocity.command.plugin-tooltip-author",
-                  Component.text(description.getAuthors().get(0))));
+              Component.text(description.getAuthors().get(0))));
         } else {
           hoverText.append(
-                  Component.translatable("velocity.command.plugin-tooltip-author",
-                          Component.text(String.join(", ", description.getAuthors()))
-                  )
+              Component.translatable("velocity.command.plugin-tooltip-author",
+                      Component.text(String.join(", ", description.getAuthors()))
+              )
           );
         }
       }
