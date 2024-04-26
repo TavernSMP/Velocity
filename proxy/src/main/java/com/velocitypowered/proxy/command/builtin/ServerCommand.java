@@ -140,7 +140,8 @@ public final class ServerCommand {
       serverTextComponent.color(NamedTextColor.GREEN)
           .hoverEvent(
               showText(
-                  Component.translatable("velocity.command.server-tooltip-current-server")
+                  Component.empty()
+                      .append(Component.translatable("velocity.command.server-tooltip-current-server"))
                       .append(Component.newline())
                       .append(playersTextComponent))
           );
@@ -149,7 +150,8 @@ public final class ServerCommand {
           .clickEvent(ClickEvent.runCommand("/server " + serverInfo.getName()))
           .hoverEvent(
               showText(
-                  Component.translatable("velocity.command.server-tooltip-offer-connect-server")
+                  Component.empty()
+                      .append(Component.translatable("velocity.command.server-tooltip-offer-connect-server"))
                       .append(Component.newline())
                       .append(playersTextComponent))
           );
