@@ -27,6 +27,8 @@ import com.velocitypowered.api.permission.Tristate;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.velocitypowered.proxy.util.ComponentUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -37,34 +39,6 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 public class AlertRawCommand {
 
   private final ProxyServer server;
-  private static final Map<String, String> colorMap = new HashMap<>();
-
-  static {
-    colorMap.put("§", "&");
-    colorMap.put("&0", "<reset><black>");
-    colorMap.put("&1", "<reset><dark_blue>");
-    colorMap.put("&2", "<reset><dark_green>");
-    colorMap.put("&3", "<reset><dark_aqua>");
-    colorMap.put("&4", "<reset><dark_red>");
-    colorMap.put("&5", "<reset><dark_purple>");
-    colorMap.put("&6", "<reset><gold>");
-    colorMap.put("&7", "<reset><gray>");
-    colorMap.put("&8", "<reset><dark_gray>");
-    colorMap.put("&9", "<reset><blue>");
-    colorMap.put("&a", "<reset><green>");
-    colorMap.put("&b", "<reset><aqua>");
-    colorMap.put("&c", "<reset><red>");
-    colorMap.put("&d", "<reset><light_purple>");
-    colorMap.put("&e", "<reset><yellow>");
-    colorMap.put("&f", "<reset><white>");
-    colorMap.put("&k", "<obfuscated>");
-    colorMap.put("&l", "<bold>");
-    colorMap.put("&m", "<strikethrough>");
-    colorMap.put("&n", "<underlined>");
-    colorMap.put("&o", "<italic>");
-    colorMap.put("&r", "<reset>");
-    colorMap.put("\\n", "<newline>");
-  }
 
   public AlertRawCommand(ProxyServer server) {
     this.server = server;
@@ -101,22 +75,8 @@ public class AlertRawCommand {
       return 0;
     }
 
-    for (Map.Entry<String, String> entry : colorMap.entrySet()) {
-      message = message.replace(entry.getKey(), entry.getValue());
-    }
-
-    boolean isAngleBracketFormat = message.contains("<");
-
-    message = message.replaceAll("&(#[A-Fa-f0-9]{6})", "$1");
-
-    message = message.replaceAll("([^<]|^)<(?:#|&#)([A-Fa-f0-9]{6})>", "$1<reset><#$2>");
-
-    if (!isAngleBracketFormat) {
-      message = message.replaceAll("([&#][A-Fa-f0-9]{6})", "<$1>");
-    }
-
     server.sendMessage(Component.translatable("velocity.command.alertraw.message", NamedTextColor.WHITE,
-            MiniMessage.miniMessage().deserialize(message)));
+            ComponentUtils.colorify(message)));
 
     return Command.SINGLE_SUCCESS;
   }
