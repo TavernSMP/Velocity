@@ -31,7 +31,7 @@ public class ConnectionMessages {
   public static final TranslatableComponent IN_PROGRESS = Component
       .translatable("velocity.error.already-connecting", NamedTextColor.RED);
   public static final TranslatableComponent INTERNAL_SERVER_CONNECTION_ERROR = Component
-      .translatable("velocity.error.internal-server-connection-error");
+      .translatable("velocity.error.internal-server-connection-error", NamedTextColor.RED);
 
   private ConnectionMessages() {
     throw new AssertionError();
