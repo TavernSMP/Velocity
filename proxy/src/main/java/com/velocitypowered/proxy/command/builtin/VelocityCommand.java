@@ -56,6 +56,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -208,19 +209,20 @@ public final class VelocityCommand {
         return Command.SINGLE_SUCCESS;
       }
 
-      Component component = Component.empty();
+      final TextComponent.Builder listBuilder = Component.text();
       for (int i = 0; i < pluginCount; i++) {
         final PluginContainer plugin = plugins.get(i);
-        component = component.append(componentForPlugin(plugin.getDescription()));
+        listBuilder.append(componentForPlugin(plugin.getDescription()));
         if (i + 1 < pluginCount) {
-          component = component.append(Component.text(", "));
+          listBuilder.append(Component.text(", "));
         }
       }
 
-      final Component output = Component.empty()
-          .append(Component.translatable("velocity.command.plugins-list").color(NamedTextColor.YELLOW))
-          .appendSpace()
-          .append(component);
+      final TranslatableComponent output = Component.translatable()
+          .key("velocity.command.plugins-list")
+          .color(NamedTextColor.YELLOW)
+          .arguments(listBuilder.build())
+          .build();
       source.sendMessage(output);
       return Command.SINGLE_SUCCESS;
     }
@@ -229,39 +231,37 @@ public final class VelocityCommand {
       final String pluginInfo = description.getName().orElse(description.getId())
           + description.getVersion().map(v -> " " + v).orElse("");
 
-      Component component = Component.empty().append(Component.text().content(pluginInfo));
+      final TextComponent.Builder hoverText = Component.text().content(pluginInfo);
 
-      if (description.getUrl().isPresent()) {
-        component = component
-            .append(Component.newline())
-            .append(Component.empty().append(Component.translatable(
+      description.getUrl().ifPresent(url -> {
+        hoverText.append(Component.newline());
+        hoverText.append(Component.translatable(
                 "velocity.command.plugin-tooltip-website",
-                Component.text(description.getUrl().get()))));
-      }
-
+                Component.text(url)));
+      });
       if (!description.getAuthors().isEmpty()) {
-        final List<String> authors = description.getAuthors();
-        final boolean multiple = authors.size() > 1;
-        final String key = multiple
-                           ? "velocity.command.plugin-tooltip-authors"
-                           : "velocity.command.plugin-tooltip-author";
-
-        component = component
-            .append(Component.newline())
-            .append(Component.translatable(key, Component.text(String.join(", ", authors))));
+        hoverText.append(Component.newline());
+        if (description.getAuthors().size() == 1) {
+          hoverText.append(Component.translatable("velocity.command.plugin-tooltip-author",
+                  Component.text(description.getAuthors().get(0))));
+        } else {
+          hoverText.append(
+                  Component.translatable("velocity.command.plugin-tooltip-author",
+                          Component.text(String.join(", ", description.getAuthors()))
+                  )
+          );
+        }
       }
-
-      if (description.getDescription().isPresent()) {
-        component = component
-            .append(Component.newline())
-            .append(Component.newline())
-            .append(Component.text(description.getDescription().get()));
-      }
+      description.getDescription().ifPresent(pdesc -> {
+        hoverText.append(Component.newline());
+        hoverText.append(Component.newline());
+        hoverText.append(Component.text(pdesc));
+      });
 
       return Component.text()
               .content(description.getId())
               .color(NamedTextColor.GRAY)
-              .hoverEvent(HoverEvent.showText(component))
+              .hoverEvent(HoverEvent.showText(hoverText.build()))
               .build();
     }
   }

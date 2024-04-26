@@ -31,6 +31,7 @@ import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,7 +82,7 @@ public final class VelocityTranslationRegistry implements TranslationRegistry {
       resultingComponent = MiniMessage.miniMessage().deserialize(miniMessageString);
     } else {
       resultingComponent = MiniMessage.miniMessage().deserialize(miniMessageString,
-              new ArgumentTag(component.args()));
+              new ArgumentTag(component.args().stream().map(c -> GlobalTranslator.render(c, locale)).toList()));
     }
 
     if (component.children().isEmpty()) {
