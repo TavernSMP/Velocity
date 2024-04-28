@@ -29,6 +29,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.server.VelocityRegisteredServer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 
 /**
  * Implements Velocity's {@code /hub} command.
@@ -63,13 +64,14 @@ public class HubCommand {
       return 0;
     }
 
-    RegisteredServer registeredServer = connection.getServer();
+    final RegisteredServer registeredServer = connection.getServer();
     if (registeredServer == null) {
       return 0;
     }
 
     if (server.getConfiguration().getAttemptConnectionOrder().contains(registeredServer.getServerInfo().getName())) {
-      player.sendMessage(Component.translatable("velocity.command.hub.fallback-connected"));
+      player.sendMessage(Component.translatable("velocity.command.hub.fallback-already-connected")
+          .arguments(Component.text(registeredServer.getServerInfo().getName())));
       return 0;
     }
 
@@ -84,7 +86,22 @@ public class HubCommand {
         return 0;
       }
 
-      player.createConnectionRequest(serverToTry).connect();
+      player.sendMessage(Component.translatable("velocity.command.hub.fallback-connecting")
+          .arguments(Component.text(serverToTry.getServerInfo().getName())));
+      TranslatableComponent fallbackMessage = Component.translatable("velocity.error.connecting-server-error")
+          .arguments(Component.text(serverToTry.getServerInfo().getName()));
+      player.createConnectionRequest(serverToTry).connect().whenComplete((result, throwable) -> {
+        if (result == null || throwable != null) {
+          player.sendMessage(fallbackMessage);
+          return;
+        }
+        if (!result.isSuccessful()) {
+          player.sendMessage(result.getReasonComponent().orElse(fallbackMessage));
+          return;
+        }
+        player.sendMessage(Component.translatable("velocity.command.hub.fallback-connected")
+            .arguments(Component.text(serverToTry.getServerInfo().getName())));
+      });
       return Command.SINGLE_SUCCESS;
     }
     return 0;

@@ -30,6 +30,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
@@ -147,6 +148,8 @@ public class SendCommand {
       for (final Player p : server.getAllPlayers()) {
         p.createConnectionRequest(targetServer).fireAndForget();
       }
+      context.getSource().sendMessage(Component.translatable("velocity.command.send-all",
+          Component.text(targetServer.getServerInfo().getName())));
       return Command.SINGLE_SUCCESS;
     }
 
@@ -158,9 +161,14 @@ public class SendCommand {
 
       final Optional<ServerConnection> connectedServer = source.getCurrentServer();
       if (connectedServer.isPresent()) {
-        for (final Player p : connectedServer.get().getServer().getPlayersConnected()) {
+        final Collection<Player> players = connectedServer.get().getServer().getPlayersConnected();
+        for (final Player p : players) {
           p.createConnectionRequest(maybeServer.get()).fireAndForget();
         }
+        context.getSource().sendMessage(Component.translatable(players.size() == 1
+                ? "velocity.command.send-server-singular" : "velocity.command.send-server-plural",
+            Component.text(players.size()), Component.text(connectedServer.get().getServerInfo().getName()),
+            Component.text(targetServer.getServerInfo().getName())));
         return Command.SINGLE_SUCCESS;
       }
       return 0;
@@ -171,9 +179,19 @@ public class SendCommand {
         String name = server.getServerInfo().getName();
 
         if (name.regionMatches(true, 0, player, 1, player.length() - 1)) {
+          final int playerSize = server.getPlayersConnected().size();
+          if (playerSize == 0) {
+            context.getSource().sendMessage(Component.translatable("velocity.command.send-server-none",
+                Component.text(name), Component.text(targetServer.getServerInfo().getName())));
+            return Command.SINGLE_SUCCESS;
+          }
           for (Player targetPlayer : server.getPlayersConnected()) {
             targetPlayer.createConnectionRequest(targetServer).fireAndForget();
           }
+          context.getSource().sendMessage(Component.translatable(playerSize == 1
+                          ? "velocity.command.send-server-singular" : "velocity.command.send-server-plural",
+                  Component.text(playerSize), Component.text(name),
+                  Component.text(targetServer.getServerInfo().getName())));
           return Command.SINGLE_SUCCESS;
         }
       }
@@ -182,7 +200,10 @@ public class SendCommand {
     }
 
     // The player at this point must be present
-    maybePlayer.orElseThrow().createConnectionRequest(targetServer).fireAndForget();
+    final Player player0 = maybePlayer.orElseThrow();
+    player0.createConnectionRequest(targetServer).fireAndForget();
+    context.getSource().sendMessage(Component.translatable("velocity.command.send-player",
+        Component.text(player0.getUsername()), Component.text(targetServer.getServerInfo().getName())));
     return Command.SINGLE_SUCCESS;
   }
 }

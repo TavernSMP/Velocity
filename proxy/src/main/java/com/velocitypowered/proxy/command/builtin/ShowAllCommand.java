@@ -91,12 +91,10 @@ public class ShowAllCommand {
     final RegisteredServer server = maybeServer.orElse(null);
     final int connectedPlayers = server.getPlayersConnected().size();
 
-    final Component header = Component.translatable(
-                    connectedPlayers == 0 ? "velocity.command.showall.header-none" :
-                            (connectedPlayers == 1 ? "velocity.command.showall.header-singular" :
-                                    "velocity.command.showall.header-plural"),
-                    NamedTextColor.YELLOW)
-            .arguments(Component.text(connectedPlayers), Component.text(server.getServerInfo().getName()));
+    final Component header = Component.translatable(connectedPlayers == 0 ? "velocity.command.showall.header-none"
+                : (connectedPlayers == 1 ? "velocity.command.showall.header-singular"
+                : "velocity.command.showall.header-plural"), NamedTextColor.YELLOW)
+        .arguments(Component.text(connectedPlayers), Component.text(server.getServerInfo().getName()));
 
     context.getSource().sendMessage(header);
 
