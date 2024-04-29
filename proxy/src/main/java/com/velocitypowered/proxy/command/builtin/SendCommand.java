@@ -150,7 +150,7 @@ public class SendCommand {
       }
       final int globalCount = server.getAllPlayers().size();
       context.getSource().sendMessage(Component.translatable(globalCount == 1
-              ? "velocity.command.send-send-all-singular" : "velocity.command.send-all-plural",
+              ? "velocity.command.send-all-singular" : "velocity.command.send-all-plural",
           Component.text(globalCount),
           Component.text(targetServer.getServerInfo().getName())));
       return Command.SINGLE_SUCCESS;
