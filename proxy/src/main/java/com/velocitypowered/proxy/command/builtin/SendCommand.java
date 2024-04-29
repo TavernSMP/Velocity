@@ -148,7 +148,10 @@ public class SendCommand {
       for (final Player p : server.getAllPlayers()) {
         p.createConnectionRequest(targetServer).fireAndForget();
       }
-      context.getSource().sendMessage(Component.translatable("velocity.command.send-all",
+      final int globalCount = server.getAllPlayers().size();
+      context.getSource().sendMessage(Component.translatable(globalCount == 1
+              ? "velocity.command.send-send-all-singular" : "velocity.command.send-all-plural",
+          Component.text(globalCount),
           Component.text(targetServer.getServerInfo().getName())));
       return Command.SINGLE_SUCCESS;
     }
