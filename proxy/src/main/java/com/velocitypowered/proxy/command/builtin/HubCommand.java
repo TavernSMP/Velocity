@@ -28,13 +28,6 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.server.VelocityRegisteredServer;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Properties;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 
@@ -77,16 +70,8 @@ public class HubCommand {
     }
 
     if (server.getConfiguration().getAttemptConnectionOrder().contains(registeredServer.getServerInfo().getName())) {
-      TranslatableComponent component = Component.translatable("velocity.command.hub.fallback-already-connected")
-              .arguments(Component.text(registeredServer.getServerInfo().getName()));
-
-
-      if (isEmpty("velocity.command.hub.fallback-already-connected")) {
-        System.out.println("It is empty");
-        return 0;
-      }
-
-      player.sendMessage(component);
+      player.sendMessage(Component.translatable("velocity.command.hub.fallback-already-connected")
+          .arguments(Component.text(registeredServer.getServerInfo().getName())));
       return 0;
     }
 
@@ -121,37 +106,4 @@ public class HubCommand {
     }
     return 0;
   }
-
-  private boolean isEmpty(String key) {
-    final Path langFolder = Path.of("lang");
-    if (Files.notExists(langFolder)) {
-      return false;
-    }
-
-    boolean contains = false;
-    try (final DirectoryStream<Path> stream
-                 = Files.newDirectoryStream(langFolder, Files::isRegularFile)) {
-      for (final Path path : stream) {
-        Properties properties = new Properties();
-        try (InputStream input = new FileInputStream("lang/" + path.getFileName())) {
-          properties.load(input);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
-        // Get the value associated with the key
-        String value = properties.getProperty(key);
-
-        if (value != null && !value.isEmpty()) {
-          contains = true;
-        }
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    return contains;
-  }
-
 }
-
-

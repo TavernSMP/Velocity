@@ -17,9 +17,6 @@
 
 package com.velocitypowered.proxy.connection.util;
 
-import static com.velocitypowered.api.network.ProtocolVersion.MAXIMUM_VERSION;
-import static com.velocitypowered.api.network.ProtocolVersion.MINIMUM_VERSION;
-
 import com.google.common.collect.ImmutableList;
 import com.spotify.futures.CompletableFutures;
 import com.velocitypowered.api.network.ProtocolVersion;
@@ -51,24 +48,19 @@ public class ServerListPingHandler {
 
   private ServerPing constructLocalPing(ProtocolVersion version) {
     if (version == ProtocolVersion.UNKNOWN) {
-      version = MAXIMUM_VERSION;
+      version = ProtocolVersion.MAXIMUM_VERSION;
     }
     VelocityConfiguration configuration = server.getConfiguration();
     return new ServerPing(
-        new ServerPing.Version(version.getProtocol(), getProtocolString(configuration.getOutdatedServerPing())),
+        new ServerPing.Version(version.getProtocol(),
+            configuration.getOutdatedServerPing().equalsIgnoreCase("{0} {1}")
+                ? "Velocity " + ProtocolVersion.SUPPORTED_VERSION_STRING : configuration.getOutdatedServerPing()),
         new ServerPing.Players(server.getPlayerCount(), configuration.getShowMaxPlayers(),
             ImmutableList.of()),
         configuration.getMotd(),
         configuration.getFavicon().orElse(null),
         configuration.isAnnounceForge() ? ModInfo.DEFAULT : null
     );
-  }
-
-  private String getProtocolString(String outdatedServerPingConfigMessage) {
-    outdatedServerPingConfigMessage = outdatedServerPingConfigMessage.replace("{0}", MINIMUM_VERSION.getVersionIntroducedIn())
-            .replace("{1}", MAXIMUM_VERSION.getMostRecentSupportedVersion()).replace("{2}", "Velocity");
-
-    return outdatedServerPingConfigMessage;
   }
 
   private CompletableFuture<ServerPing> attemptPingPassthrough(VelocityInboundConnection connection,
@@ -153,7 +145,7 @@ public class ServerListPingHandler {
   public CompletableFuture<ServerPing> getInitialPing(VelocityInboundConnection connection) {
     VelocityConfiguration configuration = server.getConfiguration();
     ProtocolVersion shownVersion = connection.getProtocolVersion().isSupported()
-        ? connection.getProtocolVersion() : MAXIMUM_VERSION;
+        ? connection.getProtocolVersion() : ProtocolVersion.MAXIMUM_VERSION;
     PingPassthroughMode passthroughMode = configuration.getPingPassthrough();
 
     if (passthroughMode == PingPassthroughMode.DISABLED) {
