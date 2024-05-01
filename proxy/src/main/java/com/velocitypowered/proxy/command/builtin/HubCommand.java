@@ -28,8 +28,10 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.server.VelocityRegisteredServer;
+import java.util.Locale;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 /**
  * Implements Velocity's {@code /hub} command.
@@ -70,8 +72,11 @@ public class HubCommand {
     }
 
     if (server.getConfiguration().getAttemptConnectionOrder().contains(registeredServer.getServerInfo().getName())) {
-      player.sendMessage(Component.translatable("velocity.command.hub.fallback-already-connected")
-          .arguments(Component.text(registeredServer.getServerInfo().getName())));
+      if (translationExists("velocity.command.hub.fallback-already-connected", player)) {
+        player.sendMessage(Component.translatable("velocity.command.hub.fallback-already-connected")
+            .arguments(Component.text(registeredServer.getServerInfo().getName())));
+      }
+
       return 0;
     }
 
@@ -86,8 +91,11 @@ public class HubCommand {
         return 0;
       }
 
-      player.sendMessage(Component.translatable("velocity.command.hub.fallback-connecting")
-          .arguments(Component.text(serverToTry.getServerInfo().getName())));
+      if (translationExists("velocity.command.hub.fallback-connecting", player)) {
+        player.sendMessage(Component.translatable("velocity.command.hub.fallback-connecting")
+            .arguments(Component.text(serverToTry.getServerInfo().getName())));
+      }
+
       TranslatableComponent fallbackMessage = Component.translatable("velocity.error.connecting-server-error")
           .arguments(Component.text(serverToTry.getServerInfo().getName()));
       player.createConnectionRequest(serverToTry).connect().whenComplete((result, throwable) -> {
@@ -105,5 +113,16 @@ public class HubCommand {
       return Command.SINGLE_SUCCESS;
     }
     return 0;
+  }
+
+  private static boolean translationExists(String key, Player player) {
+    Locale locale = player.getEffectiveLocale();
+
+    if (locale == null) {
+      locale = Locale.ENGLISH;
+    }
+
+    Component format = GlobalTranslator.translator().translate(Component.translatable(key), locale);
+    return format != null && !format.equals(Component.empty());
   }
 }
