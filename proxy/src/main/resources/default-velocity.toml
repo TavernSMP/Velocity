@@ -169,8 +169,8 @@ allow-illegal-characters-in-chat = false
 # Modifies the server brand that displays in your debug menu.
 server-brand = "{0} ({1})"
 
-# Modifies the outdated server brand that displays in your server menu.
-outdated-server-ping = "{0} {1}"
+# Modifies the server version that displays in the multiplayer menu when no passthrough occurs.
+fallback-server-ping = "{proxy-brand} {protocol-min} - {protocol-max}"
 
 [query]
 # Whether to enable responding to GameSpy 4 query responses or not.

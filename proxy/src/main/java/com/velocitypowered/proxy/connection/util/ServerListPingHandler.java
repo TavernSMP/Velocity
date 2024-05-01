@@ -52,15 +52,22 @@ public class ServerListPingHandler {
     }
     VelocityConfiguration configuration = server.getConfiguration();
     return new ServerPing(
-        new ServerPing.Version(version.getProtocol(),
-            configuration.getOutdatedServerPing().equalsIgnoreCase("{0} {1}")
-                ? "Velocity " + ProtocolVersion.SUPPORTED_VERSION_STRING : configuration.getOutdatedServerPing()),
+        new ServerPing.Version(version.getProtocol(), formatVersionString(configuration.getFallbackVersionPing(), version)),
         new ServerPing.Players(server.getPlayerCount(), configuration.getShowMaxPlayers(),
             ImmutableList.of()),
         configuration.getMotd(),
         configuration.getFavicon().orElse(null),
         configuration.isAnnounceForge() ? ModInfo.DEFAULT : null
     );
+  }
+
+  private String formatVersionString(String raw, ProtocolVersion version) {
+    return raw.replaceAll("\\{protocol-min}", ProtocolVersion.MINIMUM_VERSION.getVersionIntroducedIn())
+        .replaceAll("\\{protocol-max}", ProtocolVersion.MAXIMUM_VERSION.getVersionIntroducedIn())
+        .replaceAll("\\{protocol}", version.getVersionIntroducedIn())
+        .replaceAll("\\{proxy-brand}", this.server.getVersion().getName())
+        .replaceAll("\\{proxy-version}", this.server.getVersion().getVersion())
+        .replaceAll("\\{proxy-vendor}", this.server.getVersion().getVendor());
   }
 
   private CompletableFuture<ServerPing> attemptPingPassthrough(VelocityInboundConnection connection,
