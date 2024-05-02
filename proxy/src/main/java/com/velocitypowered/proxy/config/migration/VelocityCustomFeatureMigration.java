@@ -70,7 +70,7 @@ public final class VelocityCustomFeatureMigration implements ConfigurationMigrat
     config.setComment("advanced.server-brand", """
             Modifies the server brand that displays in your debug menu.""");
     // Customizes outdated server ping display
-    config.set("advanced.fallback-version-ping", "{proxy-brand} {protocol-min} - {protocol-max}");
+    config.set("advanced.fallback-version-ping", "{proxy-brand} {protocol-min}-{protocol-max}");
     config.setComment("advanced.fallback-version-ping", """
             Modifies the server version that displays in the multiplayer menu when no passthrough occurs.""");
     config.set("config-version", "2.7");
