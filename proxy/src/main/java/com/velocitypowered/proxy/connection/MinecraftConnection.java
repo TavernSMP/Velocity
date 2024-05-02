@@ -86,7 +86,7 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   private final Channel channel;
   private SocketAddress remoteAddress;
   private StateRegistry state;
-  private Map<StateRegistry, MinecraftSessionHandler> sessionHandlers;
+  private final Map<StateRegistry, MinecraftSessionHandler> sessionHandlers;
   private @Nullable MinecraftSessionHandler activeSessionHandler;
   private ProtocolVersion protocolVersion;
   private @Nullable MinecraftConnectionAssociation association;
