@@ -32,6 +32,10 @@ Velocity-CTD is licensed under the GPLv3 license.
 * The `/send` supports sending users from `{SERVER_FROM}` to `{SERVER_TO}`.
 * Configurable `/showall` command that displays all users connected to a specific
   instance rather than flooding your chat with users connected everywhere.
+* Implementation of configurable `/server {SERVER}` access for tab completion and
+  command execution.
+* Configurable value to disable translation for header and footer for Velocity to
+  improve performance in plugins like TAB that do not need it.
 * Configurable minimum version value that allows users to block users on versions
   older than your desired minimum server version.
 * Fallback servers allow users to be sent to the least populated server,
