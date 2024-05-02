@@ -60,6 +60,10 @@ public final class VelocityCustomFeatureMigration implements ConfigurationMigrat
     config.set("log-offline-connections", true);
     config.setComment("log-offline-connections", """
             If false, disables logging for offline player connections.""");
+    // A performance-based feature that doesn't process header and footer components for better performance
+    config.set("translate-header-footer", true);
+    config.setComment("translate-header-footer", """
+            If false, disables processing of header and footer translations for better performance.""");
     // Defines minimum connectable version through proxy under modern forwarding determinator
     config.set("minimum-version", "1.7.2");
     config.setComment("minimum-version", """

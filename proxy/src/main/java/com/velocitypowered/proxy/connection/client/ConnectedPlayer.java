@@ -448,8 +448,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   @Override
   public void sendPlayerListHeaderAndFooter(final @NotNull Component header,
                                             final @NotNull Component footer) {
-    Component translatedHeader = translateMessage(header);
-    Component translatedFooter = translateMessage(footer);
+    Component translatedHeader = header;
+    Component translatedFooter = footer;
+    if (server.getConfiguration().isTranslateHeaderFooter()) {
+      translatedHeader = translateMessage(header);
+      translatedFooter = translateMessage(footer);
+    }
     this.playerListHeader = translatedHeader;
     this.playerListFooter = translatedFooter;
     if (this.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_8)) {
