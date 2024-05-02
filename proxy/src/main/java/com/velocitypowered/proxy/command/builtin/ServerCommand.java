@@ -64,7 +64,12 @@ public final class ServerCommand {
               for (final RegisteredServer sv : server.getAllServers()) {
                 final String serverName = sv.getServerInfo().getName();
                 if (serverName.regionMatches(true, 0, argument, 0, argument.length())) {
-                  builder.suggest(serverName);
+                  if (ctx.getSource() instanceof Player player) {
+                    final String permission = "velocity.command.server." + serverName;
+                    if (player.hasPermission(permission)) {
+                      builder.suggest(serverName);
+                    }
+                  }
                 }
               }
               return builder.buildFuture();
@@ -75,6 +80,14 @@ public final class ServerCommand {
               final String serverName = StringArgumentType.getString(ctx, SERVER_ARG);
               final Optional<RegisteredServer> toConnect = server.getServer(serverName);
               if (toConnect.isEmpty()) {
+                player.sendMessage(CommandMessages.SERVER_DOES_NOT_EXIST
+                        .arguments(Component.text(serverName)));
+                return -1;
+              }
+
+              // Check if the player has permission to connect to the server
+              final String permission = "velocity.command.server." + serverName;
+              if (!player.hasPermission(permission)) {
                 player.sendMessage(CommandMessages.SERVER_DOES_NOT_EXIST
                         .arguments(Component.text(serverName)));
                 return -1;
@@ -106,15 +119,25 @@ public final class ServerCommand {
       return;
     }
 
+    // Filter servers based on player permissions
+    final List<RegisteredServer> accessibleServers = servers.stream()
+        .filter(rs -> executor.hasPermission("velocity.command.server." + rs.getServerInfo().getName()))
+        .toList();
+
+    if (accessibleServers.isEmpty()) {
+      // No accessible servers, return without showing the list
+      return;
+    }
+
     // Assemble the list of servers as components
     final TextComponent.Builder serverListBuilder = Component.text()
         .append(Component.translatable("velocity.command.server-available",
             NamedTextColor.YELLOW))
         .appendSpace();
-    for (int i = 0; i < servers.size(); i++) {
-      final RegisteredServer rs = servers.get(i);
+    for (int i = 0; i < accessibleServers.size(); i++) {
+      final RegisteredServer rs = accessibleServers.get(i);
       serverListBuilder.append(formatServerComponent(currentServer, rs));
-      if (i != servers.size() - 1) {
+      if (i != accessibleServers.size() - 1) {
         serverListBuilder.append(Component.text(", ", NamedTextColor.GRAY));
       }
     }
