@@ -47,12 +47,14 @@ public final class ServerCommand {
 
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static BrigadierCommand create(final ProxyServer server) {
-    final LiteralCommandNode<CommandSource> node = BrigadierCommand
-        .literalArgumentBuilder("server")
-        .requires(src -> src instanceof Player
-                && src.getPermissionValue("velocity.command.server") != Tristate.FALSE)
+    final LiteralCommandNode<CommandSource> node = BrigadierCommand.literalArgumentBuilder("server")
+        .requires(src -> src.getPermissionValue("velocity.command.server") != Tristate.FALSE)
         .executes(ctx -> {
-          final Player player = (Player) ctx.getSource();
+          if (!(ctx.getSource() instanceof Player player)) {
+            ctx.getSource().sendMessage(CommandMessages.PLAYERS_ONLY);
+            return 0;
+          }
+
           outputServerInformation(player, server);
           return Command.SINGLE_SUCCESS;
         })
@@ -64,18 +66,19 @@ public final class ServerCommand {
               for (final RegisteredServer sv : server.getAllServers()) {
                 final String serverName = sv.getServerInfo().getName();
                 if (serverName.regionMatches(true, 0, argument, 0, argument.length())) {
-                  if (ctx.getSource() instanceof Player player) {
-                    final String permission = "velocity.command.server." + serverName;
-                    if (player.hasPermission(permission)) {
-                      builder.suggest(serverName);
-                    }
+                  if (ctx.getSource().getPermissionValue("velocity.command.server." + serverName) != Tristate.FALSE) {
+                    builder.suggest(serverName);
                   }
                 }
               }
               return builder.buildFuture();
             })
             .executes(ctx -> {
-              final Player player = (Player) ctx.getSource();
+              if (!(ctx.getSource() instanceof Player player)) {
+                ctx.getSource().sendMessage(CommandMessages.PLAYERS_ONLY);
+                return 0;
+              }
+
               // Trying to connect to a server.
               final String serverName = StringArgumentType.getString(ctx, SERVER_ARG);
               final Optional<RegisteredServer> toConnect = server.getServer(serverName);
@@ -87,7 +90,7 @@ public final class ServerCommand {
 
               // Check if the player has permission to connect to the server
               final String permission = "velocity.command.server." + serverName;
-              if (!player.hasPermission(permission)) {
+              if (player.getPermissionValue(permission) != Tristate.FALSE) {
                 player.sendMessage(CommandMessages.SERVER_DOES_NOT_EXIST
                         .arguments(Component.text(serverName)));
                 return -1;
@@ -121,7 +124,8 @@ public final class ServerCommand {
 
     // Filter servers based on player permissions
     final List<RegisteredServer> accessibleServers = servers.stream()
-        .filter(rs -> executor.hasPermission("velocity.command.server." + rs.getServerInfo().getName()))
+        .filter(rs -> executor.getPermissionValue("velocity.command.server."
+            + rs.getServerInfo().getName()) != Tristate.FALSE)
         .toList();
 
     if (accessibleServers.isEmpty()) {
