@@ -59,6 +59,17 @@ public final class ServerCommand {
           return Command.SINGLE_SUCCESS;
         })
         .then(BrigadierCommand.requiredArgumentBuilder(SERVER_ARG, StringArgumentType.word())
+                .requires(commandSource -> {
+                  boolean flag = false;
+                  for (final RegisteredServer sv : server.getAllServers()) {
+                    final String serverName = sv.getServerInfo().getName();
+                    if (commandSource.getPermissionValue("velocity.command.server." + serverName) != Tristate.FALSE) {
+                      flag = true;
+                      break;
+                    }
+                  }
+                  return flag;
+                })
             .suggests((ctx, builder) -> {
               final String argument = ctx.getArguments().containsKey(SERVER_ARG)
                       ? StringArgumentType.getString(ctx, SERVER_ARG)
