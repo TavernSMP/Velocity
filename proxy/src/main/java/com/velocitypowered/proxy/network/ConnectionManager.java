@@ -65,7 +65,7 @@ public final class ConnectionManager {
   private final HttpClient httpClient;
 
   /**
-   * Initalizes the {@code ConnectionManager}.
+   * Initializes the {@code ConnectionManager}.
    *
    * @param server a reference to the Velocity server
    */
@@ -80,6 +80,7 @@ public final class ConnectionManager {
         new BackendChannelInitializer(this.server));
     this.resolver = new SeparatePoolInetNameResolver(GlobalEventExecutor.INSTANCE);
     this.httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .executor(this.workerGroup)
             .build();
   }
@@ -238,6 +239,11 @@ public final class ConnectionManager {
     return this.serverChannelInitializer;
   }
 
+  /**
+   * Returns a shared HTTP client instance.
+   *
+   * @return a shared HTTP client instance.
+   */
   public HttpClient getHttpClient() {
     return this.httpClient;
   }
