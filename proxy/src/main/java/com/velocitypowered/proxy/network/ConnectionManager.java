@@ -62,9 +62,10 @@ public final class ConnectionManager {
   public final BackendChannelInitializerHolder backendChannelInitializer;
 
   private final SeparatePoolInetNameResolver resolver;
+  private final HttpClient httpClient;
 
   /**
-   * Initializes the {@code ConnectionManager}.
+   * Initalizes the {@code ConnectionManager}.
    *
    * @param server a reference to the Velocity server
    */
@@ -78,6 +79,9 @@ public final class ConnectionManager {
     this.backendChannelInitializer = new BackendChannelInitializerHolder(
         new BackendChannelInitializer(this.server));
     this.resolver = new SeparatePoolInetNameResolver(GlobalEventExecutor.INSTANCE);
+    this.httpClient = HttpClient.newBuilder()
+            .executor(this.workerGroup)
+            .build();
   }
 
   public void logChannelInformation() {
@@ -234,11 +238,8 @@ public final class ConnectionManager {
     return this.serverChannelInitializer;
   }
 
-  @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public HttpClient createHttpClient() {
-    return HttpClient.newBuilder()
-            .executor(this.workerGroup)
-            .build();
+  public HttpClient getHttpClient() {
+    return this.httpClient;
   }
 
   public BackendChannelInitializerHolder getBackendChannelInitializer() {
