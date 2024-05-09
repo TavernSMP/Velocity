@@ -83,11 +83,7 @@ public final class ServerCommand {
               return builder.buildFuture();
             })
             .executes(ctx -> {
-              if (!(ctx.getSource() instanceof Player player)) {
-                ctx.getSource().sendMessage(CommandMessages.PLAYERS_ONLY);
-                return 0;
-              }
-
+              final Player player = (Player) ctx.getSource();
               // Trying to connect to a server.
               final String serverName = StringArgumentType.getString(ctx, SERVER_ARG);
               final Optional<RegisteredServer> toConnect = server.getServer(serverName);
