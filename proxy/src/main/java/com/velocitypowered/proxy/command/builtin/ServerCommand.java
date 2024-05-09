@@ -101,7 +101,7 @@ public final class ServerCommand {
 
               // Check if the player has permission to connect to the server
               final String permission = "velocity.command.server." + serverName;
-              if (player.getPermissionValue(permission) != Tristate.FALSE) {
+              if (player.getPermissionValue(permission) == Tristate.FALSE) {
                 player.sendMessage(CommandMessages.SERVER_DOES_NOT_EXIST
                         .arguments(Component.text(serverName)));
                 return -1;
