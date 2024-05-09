@@ -48,9 +48,9 @@ public final class ServerCommand {
   @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static BrigadierCommand create(final ProxyServer server) {
     final LiteralCommandNode<CommandSource> node = BrigadierCommand
-            .literalArgumentBuilder("server")
-            .requires(src -> src instanceof Player
-                    && src.getPermissionValue("velocity.command.server") != Tristate.FALSE)
+        .literalArgumentBuilder("server")
+        .requires(src -> src instanceof Player
+                && src.getPermissionValue("velocity.command.server") != Tristate.FALSE)
         .executes(ctx -> {
           final Player player = (Player) ctx.getSource();
           outputServerInformation(player, server);
