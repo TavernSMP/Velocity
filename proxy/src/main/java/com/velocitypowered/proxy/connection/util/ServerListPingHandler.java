@@ -46,8 +46,14 @@ public class ServerListPingHandler {
     this.server = server;
   }
 
+  private boolean displayOutdatedPing(ProtocolVersion clientVersion) {
+    String minVersion = server.getConfiguration().getMinimumVersion();
+    ProtocolVersion minimumVersion = ProtocolVersion.getVersionByName(minVersion);
+    return !clientVersion.lessThan(minimumVersion);
+  }
+
   private ServerPing constructLocalPing(ProtocolVersion version) {
-    if (version == ProtocolVersion.UNKNOWN) {
+    if (version == ProtocolVersion.UNKNOWN || (!displayOutdatedPing(version))) {
       version = ProtocolVersion.MAXIMUM_VERSION;
     }
     VelocityConfiguration configuration = server.getConfiguration();
@@ -62,7 +68,8 @@ public class ServerListPingHandler {
   }
 
   private String formatVersionString(String raw, ProtocolVersion version) {
-    return raw.replaceAll("\\{protocol-min}", ProtocolVersion.MINIMUM_VERSION.getVersionIntroducedIn())
+    String minVersionIntroducedIn = ProtocolVersion.getVersionByName(server.getConfiguration().getMinimumVersion()).getVersionIntroducedIn();
+    return raw.replaceAll("\\{protocol-min}", minVersionIntroducedIn)
         .replaceAll("\\{protocol-max}", ProtocolVersion.MAXIMUM_VERSION.getVersionIntroducedIn())
         .replaceAll("\\{protocol}", version.getVersionIntroducedIn())
         .replaceAll("\\{proxy-brand}", this.server.getVersion().getName())

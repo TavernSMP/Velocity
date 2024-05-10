@@ -93,7 +93,8 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
     // Make sure the player is on the minimum version set in configuration or higher
     if (!versionCheck(mcConnection)) {
       if (server.getConfiguration().isLogPlayerConnections()
-              && server.getConfiguration().isLogOfflineConnections()) {
+              && server.getConfiguration().isLogOfflineConnections()
+                  || (!server.getConfiguration().isLogMinimumVersion())) {
         return;
       }
 

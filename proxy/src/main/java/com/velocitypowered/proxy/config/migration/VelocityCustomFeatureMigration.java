@@ -69,6 +69,11 @@ public final class VelocityCustomFeatureMigration implements ConfigurationMigrat
     config.setComment("minimum-version", """
             Modify the minimum version, so the proxy blocks out users on the wrong version, rather than the backend server.
             Modern forwarding supports 1.13, at minimum. Set this to 1.13 or above if you are using modern forwarding.""");
+    // Determines whether console should log users that are joining on an unsupported version
+    config.set("log-minimum-version", false);
+    config.setComment("log-minimum-version", """
+            If true, a message is pasted in console displaying whether a user joined on an unsupported version.
+            This corresponds with the "minimum-version" and "modern-forwarding-needs-new-client" values.""");
     // Customizes debug screen server brand
     config.set("advanced.server-brand", "{0} ({1})");
     config.setComment("advanced.server-brand", """

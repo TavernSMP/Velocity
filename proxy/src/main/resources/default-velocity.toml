@@ -21,6 +21,10 @@ enforce-chat-signing = true
 # If false, disables processing of header and footer translations for better performance.
 translate-header-footer = true
 
+# If true, a message is pasted in console displaying whether a user joined on an unsupported version.
+# This corresponds with the "minimum-version" and "modern-forwarding-needs-new-client" values.
+log-minimum-version = false
+
 # Modify the minimum version, so the proxy blocks out users on the wrong version, rather than the backend server.
 # Modern forwarding supports 1.13, at minimum. Set this to 1.13 or above if you are using modern forwarding.
 minimum-version = "1.7.2"

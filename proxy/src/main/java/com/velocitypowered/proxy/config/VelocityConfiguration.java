@@ -102,6 +102,8 @@ public class VelocityConfiguration implements ProxyConfig {
   @Expose
   private boolean translateHeaderFooter = true;
   @Expose
+  private boolean logMinimumVersion = false;
+  @Expose
   private String minimumVersion = "1.7.2";
 
   private VelocityConfiguration(Servers servers, ForcedHosts forcedHosts, Advanced advanced,
@@ -120,7 +122,7 @@ public class VelocityConfiguration implements ProxyConfig {
       boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
       Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
       boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning,
-      boolean translateHeaderFooter, String minimumVersion) {
+      boolean translateHeaderFooter, boolean logMinimumVersion, String minimumVersion) {
     this.bind = bind;
     this.motd = motd;
     this.showMaxPlayers = showMaxPlayers;
@@ -142,6 +144,7 @@ public class VelocityConfiguration implements ProxyConfig {
     this.disableForge = disableForge;
     this.enforceChatSigning = enforceChatSigning;
     this.translateHeaderFooter = translateHeaderFooter;
+    this.logMinimumVersion = logMinimumVersion;
     this.minimumVersion = minimumVersion;
   }
 
@@ -463,6 +466,7 @@ public class VelocityConfiguration implements ProxyConfig {
         .add("disableForge", disableForge)
         .add("enforceChatSigning", enforceChatSigning)
         .add("translateHeaderFooter", translateHeaderFooter)
+        .add("logMinimumVersion", logMinimumVersion)
         .add("minimumVersion", minimumVersion)
         .toString();
   }
@@ -562,6 +566,8 @@ public class VelocityConfiguration implements ProxyConfig {
               "enforce-chat-signing", false);
       final boolean translateHeaderFooter = config.getOrElse(
               "translate-header-footer", true);
+      final boolean logMinimumVersion = config.getOrElse(
+              "log-minimum-version", false);
       final String minimumVersion = config.getOrElse("minimum-version", "1.7.2");
 
       // Throw an exception if the forwarding-secret file is empty and the proxy is using a
@@ -594,6 +600,7 @@ public class VelocityConfiguration implements ProxyConfig {
               disableForge,
               enforceChatSigning,
               translateHeaderFooter,
+              logMinimumVersion,
               minimumVersion
       );
     }
@@ -633,6 +640,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
   public boolean isTranslateHeaderFooter() {
     return translateHeaderFooter;
+  }
+
+  public boolean isLogMinimumVersion() {
+    return logMinimumVersion;
   }
 
   public String getMinimumVersion() {
