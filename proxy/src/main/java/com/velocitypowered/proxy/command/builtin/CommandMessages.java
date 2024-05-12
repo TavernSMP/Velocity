@@ -31,7 +31,7 @@ public class CommandMessages {
   public static final TranslatableComponent SERVER_DOES_NOT_EXIST = Component.translatable(
       "velocity.command.server-does-not-exist", NamedTextColor.RED);
   public static final TranslatableComponent SERVER_MULTIPLE_MATCH = Component.translatable(
-          "velocity.command.server-multiple-matches", NamedTextColor.RED);
+      "velocity.command.server-multiple-matches", NamedTextColor.RED);
   public static final TranslatableComponent PLAYER_NOT_FOUND = Component.translatable(
       "velocity.command.player-not-found", NamedTextColor.RED);
 }
