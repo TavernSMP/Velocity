@@ -100,7 +100,7 @@ public final class InitialInboundConnection implements VelocityInboundConnection
    */
   public void disconnect(Component reason) {
     Component translated = GlobalTranslator.render(reason, ClosestLocaleMatcher.INSTANCE
-            .lookupClosest(Locale.getDefault()));
+        .lookupClosest(Locale.getDefault()));
     if (connection.server.getConfiguration().isLogPlayerConnections()
             && connection.server.getConfiguration().isLogOfflineConnections()
                 && connection.server.getConfiguration().isLogMinimumVersion()) {
