@@ -18,9 +18,12 @@
 package com.velocitypowered.proxy.protocol.packet.chat;
 
 import com.velocitypowered.proxy.connection.MinecraftConnection;
+import com.velocitypowered.proxy.connection.backend.ConfigSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import io.netty.channel.ChannelFuture;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +34,7 @@ import java.util.function.Function;
  * piggybacking timestamps.
  */
 public class ChatQueue {
+  private static final Logger logger = LogManager.getLogger(ChatQueue.class);
 
   private final Object internalLock;
   private final ConnectedPlayer player;
@@ -57,7 +61,12 @@ public class ChatQueue {
    */
   public void queuePacket(CompletableFuture<MinecraftPacket> nextPacket, Instant timestamp) {
     synchronized (internalLock) { // wait for the lock to resolve - we don't want to drop packets
-      MinecraftConnection smc = player.ensureAndGetCurrentServer().ensureConnected();
+      MinecraftConnection smc = player.ensureAndGetCurrentServer().getConnection();
+
+      if (smc == null) {
+        logger.warn("Attempted to queue a chat packet for a disconnected player: {}", player);
+        return;
+      }
 
       CompletableFuture<WrappedPacket> nextInLine = WrappedPacket.wrap(timestamp, nextPacket);
       this.packetFuture = awaitChat(smc, this.packetFuture,
@@ -79,7 +88,12 @@ public class ChatQueue {
       InstantPacketMapper<K, V> instantMapper) {
     synchronized (internalLock) {
       CompletableFuture<K> trueFuture = CompletableFuture.completedFuture(packet);
-      MinecraftConnection smc = player.ensureAndGetCurrentServer().ensureConnected();
+      MinecraftConnection smc = player.ensureAndGetCurrentServer().getConnection();
+
+      if (smc == null) {
+        logger.warn("Attempted to hijack chat queue for a disconnected player: {}", player);
+        return;
+      }
 
       this.packetFuture = hijackCurrentPacket(smc, this.packetFuture, trueFuture, instantMapper);
     }
