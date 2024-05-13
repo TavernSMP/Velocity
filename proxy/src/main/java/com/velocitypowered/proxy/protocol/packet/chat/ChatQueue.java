@@ -18,7 +18,6 @@
 package com.velocitypowered.proxy.protocol.packet.chat;
 
 import com.velocitypowered.proxy.connection.MinecraftConnection;
-import com.velocitypowered.proxy.connection.backend.ConfigSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.protocol.MinecraftPacket;
 import io.netty.channel.ChannelFuture;
