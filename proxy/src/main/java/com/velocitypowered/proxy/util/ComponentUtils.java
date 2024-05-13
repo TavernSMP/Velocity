@@ -37,14 +37,14 @@ public final class ComponentUtils {
   // MiniMessage default: <#FFFFFF>
   private static final Pattern BOXED_HEX_PATTERN = Pattern.compile("<#([A-Fa-f0-9]){6}>");
   private static final Pattern BOXED_MOJANG_PATTERN = Pattern.compile("<&#([A-Fa-f0-9]){6}>"); // &#FFFFFF
-  private static final Pattern UNBOXED_HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]){6}"); // <&#FFFFFF>
+  private static final Pattern UNBOXED_HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]){6}");     // <&#FFFFFF>
   private static final Pattern UNBOXED_MOJANG_PATTERN = Pattern.compile("&#([A-Fa-f0-9]){6}"); // #FFFFFF
 
   private static final List<Pattern> ODD_HEX_PATTERNS = Arrays.asList(
-      BOXED_MOJANG_PATTERN,  // <&#FFFFFF>
+      BOXED_MOJANG_PATTERN,   // <&#FFFFFF>
       BOXED_HEX_PATTERN,
       UNBOXED_MOJANG_PATTERN, // &#FFFFFF
-      UNBOXED_HEX_PATTERN      // #FFFFFF
+      UNBOXED_HEX_PATTERN     // #FFFFFF
   ); // <!> order matters
 
   private static final List<Pattern> UNBOXED_PATTERNS = Arrays.asList(
@@ -131,7 +131,6 @@ public final class ComponentUtils {
     for (final Pattern pattern : ODD_HEX_PATTERNS) {
       parsedStr = colorMatcher(parsedStr, pattern, UNBOXED_PATTERNS.contains(pattern));
     }
-
     return parseComponent(parsedStr.replace("D#DONE", "#"));
   }
 
@@ -147,7 +146,6 @@ public final class ComponentUtils {
     for (Map.Entry<String, String> entry : COLOR_MAP.entrySet()) {
       parsedStr = parsedStr.replace(entry.getKey(), entry.getValue());
     }
-
     return parsedStr;
   }
 
@@ -191,8 +189,7 @@ public final class ComponentUtils {
         if (MOJANG_PATTERNS.contains(pattern)) {
           final String start = matched.substring(0, index).replace("&", "");
           final String end = matched.substring(index + 7);
-
-          literal = literal.replace(matched,  start + "D#DONE" + hexCode + end);
+          literal = literal.replace(matched, start + "D#DONE" + hexCode + end);
         } else {
           final String start = matched.substring(0, index);
           final String end = matched.substring(index + 7);
@@ -202,7 +199,6 @@ public final class ComponentUtils {
         literal = literal.replace(matched, "<D#DONE" + hexCode + ">");
       }
     }
-
     return literal;
   }
 
