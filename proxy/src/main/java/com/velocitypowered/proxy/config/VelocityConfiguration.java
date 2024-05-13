@@ -437,6 +437,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.getFallbackVersionPing();
   }
 
+  public String getOutdatedVersionPing() {
+    return advanced.getOutdatedVersionPing();
+  }
+
   public boolean isEnableDynamicFallbacks() {
     return servers.isEnableDynamicFallbacks();
   }
@@ -815,6 +819,8 @@ public class VelocityConfiguration implements ProxyConfig {
     private String serverBrand = "{0} ({1})";
     @Expose
     private String fallbackVersionPing = "{proxy-brand} {protocol-min}-{protocol-max}";
+    @Expose
+    private String outdatedVersionPing = "{proxy-brand} {protocol-min}-{protocol-max}";
 
     private Advanced() {
     }
@@ -843,6 +849,7 @@ public class VelocityConfiguration implements ProxyConfig {
         this.allowIllegalCharactersInChat = config.getOrElse("allow-illegal-characters-in-chat", false);
         this.serverBrand = config.getOrElse("server-brand", "{0} ({1})");
         this.fallbackVersionPing = config.getOrElse("fallback-version-ping", "{proxy-brand} {protocol-min}-{protocol-max}");
+        this.outdatedVersionPing = config.getOrElse("outdated-version-ping", "{proxy-brand} {protocol-min}-{protocol-max}");
       }
     }
 
@@ -937,6 +944,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
     public String getFallbackVersionPing() {
       return this.fallbackVersionPing;
+    }
+
+    public String getOutdatedVersionPing() {
+      return this.outdatedVersionPing;
     }
   }
 

@@ -53,12 +53,17 @@ public class ServerListPingHandler {
   }
 
   private ServerPing constructLocalPing(ProtocolVersion version) {
-    if (version == ProtocolVersion.UNKNOWN || (!displayOutdatedPing(version))) {
+    boolean outdated = !displayOutdatedPing(version);
+
+    if (version == ProtocolVersion.UNKNOWN || (outdated)) {
       version = ProtocolVersion.MAXIMUM_VERSION;
     }
+
     VelocityConfiguration configuration = server.getConfiguration();
+    String serverPingVersion = outdated ? configuration.getOutdatedVersionPing() : configuration.getFallbackVersionPing();
+
     return new ServerPing(
-        new ServerPing.Version(version.getProtocol(), formatVersionString(configuration.getFallbackVersionPing(), version)),
+        new ServerPing.Version(version.getProtocol(), formatVersionString(serverPingVersion, version)),
         new ServerPing.Players(server.getPlayerCount(), configuration.getShowMaxPlayers(),
             ImmutableList.of()),
         configuration.getMotd(),
