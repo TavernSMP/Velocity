@@ -35,13 +35,22 @@ import org.jetbrains.annotations.NotNull;
 public final class ComponentUtils {
 
   // MiniMessage default: <#FFFFFF>
-  private static final Pattern STANDARD_HEX_PATTERN = Pattern.compile("<#([A-Fa-f0-9]){6}>");
+  private static final Pattern BOXED_HEX_PATTERN = Pattern.compile("<#([A-Fa-f0-9]){6}>");
+  private static final Pattern BOXED_MOJANG_PATTERN = Pattern.compile("<&#([A-Fa-f0-9]){6}>"); // &#FFFFFF
+  private static final Pattern UNBOXED_HEX_PATTERN = Pattern.compile("#([A-Fa-f0-9]){6}"); // <&#FFFFFF>
+  private static final Pattern UNBOXED_MOJANG_PATTERN = Pattern.compile("&#([A-Fa-f0-9]){6}"); // #FFFFFF
+
   private static final List<Pattern> ODD_HEX_PATTERNS = Arrays.asList(
-        Pattern.compile("<&#([A-Fa-f0-9]){6}>"),  // <&#FFFFFF>
-        STANDARD_HEX_PATTERN,
-        Pattern.compile("&#([A-Fa-f0-9]){6}"),    // &#FFFFFF
-        Pattern.compile("#([A-Fa-f0-9]){6}")      // #FFFFFF
+      BOXED_MOJANG_PATTERN,  // <&#FFFFFF>
+      BOXED_HEX_PATTERN,
+      UNBOXED_MOJANG_PATTERN, // &#FFFFFF
+      UNBOXED_HEX_PATTERN      // #FFFFFF
   ); // <!> order matters
+
+  private static final List<Pattern> UNBOXED_PATTERNS = Arrays.asList(
+      UNBOXED_HEX_PATTERN,
+      UNBOXED_MOJANG_PATTERN
+  );
 
   private static final MiniMessage MINI = MiniMessage.builder()
           .strict(false)
@@ -114,31 +123,11 @@ public final class ComponentUtils {
     String parsedStr = input;
 
     // Parse the hex patterns
-    for (Pattern pattern : ODD_HEX_PATTERNS) {
-      final Matcher matcher = pattern.matcher(parsedStr);
-
-      while (matcher.find()) {
-        // Replace the odd hex pattern with a standard hex pattern
-        final String match = matcher.group();
-        final String hexValue = match.substring(match.indexOf("#") + 1, match.indexOf("#") + 7);
-
-        parsedStr = parsedStr.replace(match, "<#DONE" + hexValue.toUpperCase() + ">");
-      }
+    for (final Pattern pattern : ODD_HEX_PATTERNS) {
+      parsedStr = colorMatcher(parsedStr, pattern, UNBOXED_PATTERNS.contains(pattern));
     }
 
-    // Remove the 'DONE' from all the hex patterns
-    final Pattern donePattern = Pattern.compile("<#DONE([A-Fa-f0-9]){6}>");
-    final Matcher doneMatcher = donePattern.matcher(parsedStr);
-    while (doneMatcher.find()) {
-      // Get rid of the 'DONE' in the hex pattern
-      final String match = doneMatcher.group();
-      final String hexValue = match.substring(match.indexOf("#") + 5, match.indexOf("#") + 11);
-
-      parsedStr = parsedStr.replace(match, "<#" + hexValue + ">");
-    }
-
-    // Parse the final component
-    return parseComponent(parsedStr);
+    return parseComponent(parsedStr.replace("D#DONE", "#"));
   }
 
   /**
@@ -168,6 +157,47 @@ public final class ComponentUtils {
       input = pattern.matcher(input).replaceAll("");
     }
     return input;
+  }
+
+  private static @NotNull String colorMatcher(@NotNull String literal, @NotNull Pattern pattern, boolean unboxed) {
+    final Matcher matcher = pattern.matcher(literal);
+
+    while (matcher.find()) {
+      final String matched = matcher.group();
+      boolean requiresBoxing = false;
+
+      if (unboxed) {
+        final int literalIndex = literal.indexOf(matched);
+        final int afterLiteralIndex = literalIndex + matched.length();
+
+        if (literal.length() >= afterLiteralIndex) {
+          final char charAt = literal.charAt(afterLiteralIndex);
+
+          if (charAt != ':' && charAt != '>') {
+            requiresBoxing = true;
+          }
+        }
+      }
+
+      final int index = matched.indexOf("#");
+      final String hexCode = matched.substring(index + 1, index + 7);
+
+      if (!requiresBoxing) {
+        if (pattern.equals(BOXED_MOJANG_PATTERN)) {
+          final String start = matched.substring(0, index).replace("&", "");
+          final String end = matched.substring(index + 7);
+          literal = literal.replace(matched,  start + "D#DONE" + hexCode + end);
+        } else {
+          final String start = matched.substring(0, index);
+          final String end = matched.substring(index + 7);
+          literal = literal.replace(matched, start + "D#DONE" + hexCode + end);
+        }
+      } else {
+        literal = literal.replace(matched, "<D#DONE" + hexCode + ">");
+      }
+    }
+
+    return literal;
   }
 
   /**
