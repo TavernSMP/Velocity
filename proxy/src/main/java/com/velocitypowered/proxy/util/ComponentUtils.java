@@ -52,6 +52,11 @@ public final class ComponentUtils {
       UNBOXED_MOJANG_PATTERN
   );
 
+  private static final List<Pattern> MOJANG_PATTERNS = Arrays.asList(
+      BOXED_MOJANG_PATTERN,
+      UNBOXED_MOJANG_PATTERN
+  );
+
   private static final MiniMessage MINI = MiniMessage.builder()
           .strict(false)
           .build();
@@ -124,8 +129,14 @@ public final class ComponentUtils {
 
     // Parse the hex patterns
     for (final Pattern pattern : ODD_HEX_PATTERNS) {
+      System.out.println(" ");
+      System.out.println("Checking: " + pattern.pattern());
       parsedStr = colorMatcher(parsedStr, pattern, UNBOXED_PATTERNS.contains(pattern));
+      System.out.println("New result: " + parsedStr);
     }
+
+    System.out.println(" ");
+    System.out.println("Found result: " + parsedStr);
 
     return parseComponent(parsedStr.replace("D#DONE", "#"));
   }
@@ -183,9 +194,12 @@ public final class ComponentUtils {
       final String hexCode = matched.substring(index + 1, index + 7);
 
       if (!requiresBoxing) {
-        if (pattern.equals(BOXED_MOJANG_PATTERN)) {
+        if (MOJANG_PATTERNS.contains(pattern)) {
           final String start = matched.substring(0, index).replace("&", "");
           final String end = matched.substring(index + 7);
+          System.out.println("Rebuilding boxed start: " + start);
+          System.out.println("Rebuilding boxed end: " + end);
+
           literal = literal.replace(matched,  start + "D#DONE" + hexCode + end);
         } else {
           final String start = matched.substring(0, index);
