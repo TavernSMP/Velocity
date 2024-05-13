@@ -176,6 +176,9 @@ allow-illegal-characters-in-chat = false
 # Modifies the server brand that displays in your debug menu.
 server-brand = "{0} ({1})"
 
+# Modifies the server version that displays in some server status pinging sites.
+outdated-version-ping = "{protocol-min}-{protocol-max} ({proxy-brand})"
+
 # Modifies the server version that displays in the multiplayer menu when no passthrough occurs.
 fallback-version-ping = "{proxy-brand} {protocol-min}-{protocol-max}"
 

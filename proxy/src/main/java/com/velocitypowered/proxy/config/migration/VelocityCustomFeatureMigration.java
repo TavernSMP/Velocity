@@ -25,10 +25,12 @@ import org.apache.logging.log4j.Logger;
  * Creation of the configuration option "disable-forge".
  * Creation of the configuration option "enable-dynamic-fallbacks".
  * Creation of the configuration option "enforce-chat-signing".
+ * Creation of the configuration option "fallback-version-ping".
  * Creation of the configuration option "log-offline-connections".
  * Creation of the configuration option "minimum-version".
- * Creation of the configuration option "outdated-server-ping".
+ * Creation of the configuration option "outdated-version-ping".
  * Creation of the configuration option "server-brand".
+ * Creation of the configuration option "translate-header-footer".
  */
 public final class VelocityCustomFeatureMigration implements ConfigurationMigration {
   @Override
@@ -79,6 +81,10 @@ public final class VelocityCustomFeatureMigration implements ConfigurationMigrat
     config.setComment("advanced.server-brand", """
             Modifies the server brand that displays in your debug menu.""");
     // Customizes outdated server ping display
+    config.set("advanced.outdated-version-ping", "{protocol-min}-{protocol-max} ({proxy-brand})");
+    config.setComment("advanced.outdated-version-ping", """
+            Modifies the server version that displays in some server status pinging sites.""");
+    // Customizes server ping display
     config.set("advanced.fallback-version-ping", "{proxy-brand} {protocol-min}-{protocol-max}");
     config.setComment("advanced.fallback-version-ping", """
             Modifies the server version that displays in the multiplayer menu when no passthrough occurs.""");

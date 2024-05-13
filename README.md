@@ -37,10 +37,10 @@ Velocity-CTD is licensed under the GPLv3 license.
 * Configurable value to disable translation for header and footer for Velocity to
   improve performance in plugins like TAB that do not need it.
 * Configurable minimum version value that allows users to block users on versions
-  older than your desired minimum server version.
+  older than your desired minimum server version (synchronizes with outdated pinger).
 * Fallback servers allow users to be sent to the least populated server,
   which will cycle for even distribution.
-* Configurable server brand and server pinger message.
+* Configurable server brand and server pinger message (outdated and fallback).
 * Configurable removal of unsigned message kick/disconnection events for plugins
   with improper compatibility.
 * Configurable deactivation of Forge inbound handshakes for servers that do not

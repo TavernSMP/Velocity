@@ -58,10 +58,8 @@ public class ServerListPingHandler {
     if (version == ProtocolVersion.UNKNOWN || (outdated)) {
       version = ProtocolVersion.MAXIMUM_VERSION;
     }
-
     VelocityConfiguration configuration = server.getConfiguration();
     String serverPingVersion = outdated ? configuration.getOutdatedVersionPing() : configuration.getFallbackVersionPing();
-
     return new ServerPing(
         new ServerPing.Version(version.getProtocol(), formatVersionString(serverPingVersion, version)),
         new ServerPing.Players(server.getPlayerCount(), configuration.getShowMaxPlayers(),
