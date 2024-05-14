@@ -351,7 +351,9 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
                   translationRegistry.register(key, locale, messageFormat);
                 }
-              } catch (final IOException ignored) {}
+              } catch (final IOException ignored) {
+                //ignored
+              }
 
               ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
             });
