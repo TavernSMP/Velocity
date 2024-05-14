@@ -48,7 +48,7 @@ Velocity-CTD is licensed under the GPLv3 license.
 * Other miscellaneous optimizations and tweaks that will only continue to be
   implemented as this fork matures.
 * Preliminary MiniMessage support to permit full configurability of all Velocity
-  messages.
+  messages, alongside `/velocity reload`able translations.
 * Removal of all language files except `messages.properties` to preserve
   maintainability. PRs are welcome to reimplement all language files
   with our changes.
