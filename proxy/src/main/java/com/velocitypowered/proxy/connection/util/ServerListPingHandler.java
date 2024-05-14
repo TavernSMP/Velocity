@@ -73,7 +73,7 @@ public class ServerListPingHandler {
   private String formatVersionString(String raw, ProtocolVersion version) {
     String minVersionIntroducedIn = ProtocolVersion.getVersionByName(server.getConfiguration().getMinimumVersion()).getVersionIntroducedIn();
     return raw.replaceAll("\\{protocol-min}", minVersionIntroducedIn)
-        .replaceAll("\\{protocol-max}", ProtocolVersion.MAXIMUM_VERSION.getVersionIntroducedIn())
+        .replaceAll("\\{protocol-max}", ProtocolVersion.MAXIMUM_VERSION.getMostRecentSupportedVersion())
         .replaceAll("\\{protocol}", version.getVersionIntroducedIn())
         .replaceAll("\\{proxy-brand}", this.server.getVersion().getName())
         .replaceAll("\\{proxy-version}", this.server.getVersion().getVersion())
