@@ -93,6 +93,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -110,6 +111,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.translation.GlobalTranslator;
 import net.kyori.adventure.translation.TranslationRegistry;
+import net.kyori.adventure.translation.Translator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
@@ -170,6 +172,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private final VelocityScheduler scheduler;
   private final VelocityChannelRegistrar channelRegistrar = new VelocityChannelRegistrar();
   private final ServerListPingHandler serverListPingHandler;
+  private final Key translationRegistryKey = Key.key("velocity", "translations");
 
   VelocityServer(final ProxyOptions options) {
     pluginManager = new VelocityPluginManager(this);
@@ -247,7 +250,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
     this.doStartupConfigLoad();
 
-    registerTranslations();
+    registerTranslations(true);
 
     for (Map.Entry<String, String> entry : configuration.getServers().entrySet()) {
       servers.register(new ServerInfo(entry.getKey(), AddressUtil.parseAddress(entry.getValue())));
@@ -284,13 +287,24 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
   }
 
-  private void registerTranslations() {
-    final TranslationRegistry translationRegistry = new VelocityTranslationRegistry(
-            TranslationRegistry.create(Key.key("velocity", "translations")));
+
+  private void unregisterTranslations() {
+    for (final Translator source : GlobalTranslator.translator().sources()) {
+      if (source.name().equals(this.translationRegistryKey)) {
+        GlobalTranslator.translator().removeSource(source);
+      }
+    }
+  }
+
+  private void registerTranslations(boolean log) {
+    final TranslationRegistry translationRegistry = new VelocityTranslationRegistry(TranslationRegistry.create(this.translationRegistryKey));
     translationRegistry.defaultLocale(Locale.US);
+
     try {
       ResourceUtils.visitResources(VelocityServer.class, path -> {
-        logger.info("Loading localizations...");
+        if (log) {
+          logger.info("Loading localizations...");
+        }
 
         final Path langPath = Path.of("lang");
 
@@ -311,7 +325,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
                 }
               });
             }
-
           }
 
           try (final Stream<Path> files = Files.walk(langPath)) {
@@ -327,18 +340,19 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
               try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
                 final ResourceBundle bundle = new PropertyResourceBundle(reader);
+                final Set<String> keys = bundle.keySet();
 
-                translationRegistry.registerAll(locale, bundle.keySet(), key -> {
+                for (final String key : keys) {
+                  translationRegistry.unregister(key);
+
                   final String format = bundle.getString(key);
                   final String escapedFormat = format.replace("'", "''");
-                  final MessageFormat messageFormat;
-                  messageFormat = new MessageFormat(escapedFormat, locale);
+                  final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
 
-                  return messageFormat;
-                });
-              } catch (final IOException e) {
-                // ignored
-              }
+                  translationRegistry.register(key, locale, messageFormat);
+                }
+              } catch (final IOException ignored) {}
+
               ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
             });
           }
@@ -441,6 +455,9 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     if (!newConfiguration.validate()) {
       return false;
     }
+
+    unregisterTranslations();
+    registerTranslations(false);
 
     // Re-register servers. If a server is being replaced, make sure to note what players need to
     // move back to a fallback server.
