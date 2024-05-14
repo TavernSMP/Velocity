@@ -287,7 +287,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     Metrics.VelocityMetrics.startMetrics(this, configuration.getMetrics());
   }
 
-
   private void unregisterTranslations() {
     for (final Translator source : GlobalTranslator.translator().sources()) {
       if (source.name().equals(this.translationRegistryKey)) {
@@ -299,7 +298,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   private void registerTranslations(boolean log) {
     final TranslationRegistry translationRegistry = new VelocityTranslationRegistry(TranslationRegistry.create(this.translationRegistryKey));
     translationRegistry.defaultLocale(Locale.US);
-
     try {
       ResourceUtils.visitResources(VelocityServer.class, path -> {
         if (log) {
@@ -354,7 +352,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
               } catch (final IOException ignored) {
                 //ignored
               }
-
               ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
             });
           }
