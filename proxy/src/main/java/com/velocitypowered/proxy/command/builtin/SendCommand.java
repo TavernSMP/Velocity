@@ -197,10 +197,19 @@ public class SendCommand {
 
     // The player at this point must be present
     final Player player0 = maybePlayer.orElseThrow();
-    player0.createConnectionRequest(targetServer).fireAndForget();
-    context.getSource().sendMessage(Component.translatable("velocity.command.send-player",
-        Component.text(player0.getUsername()), Component.text(targetServer.getServerInfo().getName())));
+    sendPlayer(player0, targetServer, context);
     return Command.SINGLE_SUCCESS;
+  }
+
+  private void sendPlayer(Player player, RegisteredServer targetServer, CommandContext<CommandSource> context) {
+    if (player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().equals(targetServer)) {
+      context.getSource().sendMessage(Component.translatable("velocity.command.send-player-none",
+              Component.text(player.getUsername()), Component.text(targetServer.getServerInfo().getName())));
+    } else {
+      player.createConnectionRequest(targetServer).fireAndForget();
+      context.getSource().sendMessage(Component.translatable("velocity.command.send-player",
+              Component.text(player.getUsername()), Component.text(targetServer.getServerInfo().getName())));
+    }
   }
 
   private void sendPlayersFromServer(CommandContext<CommandSource> context, RegisteredServer server, RegisteredServer targetServer) {
