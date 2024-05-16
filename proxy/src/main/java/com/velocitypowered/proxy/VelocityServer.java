@@ -456,6 +456,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     }
 
     unregisterTranslations();
+
     registerTranslations(false);
 
     // Re-register servers. If a server is being replaced, make sure to note what players need to
