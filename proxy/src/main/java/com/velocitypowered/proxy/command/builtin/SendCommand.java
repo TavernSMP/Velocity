@@ -201,14 +201,14 @@ public class SendCommand {
     return Command.SINGLE_SUCCESS;
   }
 
-  private void sendPlayer(Player player, RegisteredServer targetServer, CommandContext<CommandSource> context) {
-    if (player.getCurrentServer().isPresent() && player.getCurrentServer().get().getServer().equals(targetServer)) {
+  private void sendPlayer(Player player0, RegisteredServer targetServer, CommandContext<CommandSource> context) {
+    if (player0.getCurrentServer().isPresent() && player0.getCurrentServer().get().getServer().equals(targetServer)) {
       context.getSource().sendMessage(Component.translatable("velocity.command.send-player-none",
-              Component.text(player.getUsername()), Component.text(targetServer.getServerInfo().getName())));
+              Component.text(player0.getUsername()), Component.text(targetServer.getServerInfo().getName())));
     } else {
-      player.createConnectionRequest(targetServer).fireAndForget();
+      player0.createConnectionRequest(targetServer).fireAndForget();
       context.getSource().sendMessage(Component.translatable("velocity.command.send-player",
-              Component.text(player.getUsername()), Component.text(targetServer.getServerInfo().getName())));
+              Component.text(player0.getUsername()), Component.text(targetServer.getServerInfo().getName())));
     }
   }
 
