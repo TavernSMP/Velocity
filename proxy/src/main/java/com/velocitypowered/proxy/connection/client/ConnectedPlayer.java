@@ -945,7 +945,8 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     return mc;
   }
 
-  void teardown() {
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
+  public void teardown() {
     if (connectionInFlight != null) {
       connectionInFlight.disconnect();
     }
