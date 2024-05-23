@@ -45,7 +45,6 @@ import com.velocitypowered.proxy.protocol.packet.config.RegistrySyncPacket;
 import com.velocitypowered.proxy.protocol.packet.config.StartUpdatePacket;
 import com.velocitypowered.proxy.protocol.packet.config.TagsUpdatePacket;
 import com.velocitypowered.proxy.protocol.util.PluginMessageUtil;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import org.apache.logging.log4j.LogManager;
@@ -82,6 +81,9 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public void activated() {
+    if (!serverConn.isActive()) {
+      return;
+    }
     ConnectedPlayer player = serverConn.getPlayer();
     if (player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_20_2) {
       resourcePackToApply = player.resourcePackHandler().getFirstAppliedPack();
@@ -101,24 +103,36 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(StartUpdatePacket packet) {
+    if (!serverConn.isActive()) {
+      return false;
+    }
     serverConn.ensureConnected().write(packet);
     return true;
   }
 
   @Override
   public boolean handle(TagsUpdatePacket packet) {
-    serverConn.getPlayer().getConnection().write(packet);
-    return true;
+    if (serverConn.isActive()) {
+      serverConn.getPlayer().getConnection().write(packet);
+      return true;
+    }
+    return false;
   }
 
   @Override
   public boolean handle(KeepAlivePacket packet) {
-    serverConn.ensureConnected().write(packet);
-    return true;
+    if (serverConn.isActive()) {
+      serverConn.ensureConnected().write(packet);
+      return true;
+    }
+    return false;
   }
 
   @Override
   public boolean handle(final ResourcePackRequestPacket packet) {
+    if (!serverConn.isActive()) {
+      return false;
+    }
     final MinecraftConnection playerConnection = serverConn.getPlayer().getConnection();
 
     final ResourcePackInfo resourcePackInfo = packet.toServerPromptedPack();
@@ -142,7 +156,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
           if (serverConn.getConnection() != null) {
             // We can technically skip these first 2 states, however, for conformity to normal state flow expectations...
             serverConn.getConnection().write(new ResourcePackResponsePacket(
-                    packet.getId(), packet.getHash(), PlayerResourcePackStatusEvent.Status.ACCEPTED));
+                packet.getId(), packet.getHash(), PlayerResourcePackStatusEvent.Status.ACCEPTED));
             serverConn.getConnection().write(new ResourcePackResponsePacket(
                 packet.getId(), packet.getHash(), PlayerResourcePackStatusEvent.Status.DOWNLOADED));
             serverConn.getConnection().write(new ResourcePackResponsePacket(
@@ -174,6 +188,9 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(FinishedUpdatePacket packet) {
+    if (!serverConn.isActive()) {
+      return false;
+    }
     MinecraftConnection smc = serverConn.ensureConnected();
     ConnectedPlayer player = serverConn.getPlayer();
     ClientConfigSessionHandler configHandler =
@@ -205,7 +222,9 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
   @Override
   public boolean handle(DisconnectPacket packet) {
     serverConn.disconnect();
-    resultFuture.complete(ConnectionRequestResults.forDisconnect(packet, serverConn.getServer()));
+    if (!resultFuture.isDone()) {
+      resultFuture.complete(ConnectionRequestResults.forDisconnect(packet, serverConn.getServer()));
+    }
     return true;
   }
 
@@ -237,6 +256,9 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
           from Backend Server in Configuration State""");
       return true;
     }
+    if (!serverConn.isActive()) {
+      return false;
+    }
     this.server.getEventManager()
             .fire(new PreTransferEvent(this.serverConn.getPlayer(), originalAddress))
             .thenAcceptAsync(event -> {
@@ -245,8 +267,10 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
                 if (resultedAddress == null) {
                   resultedAddress = originalAddress;
                 }
-                serverConn.getPlayer().getConnection().write(new TransferPacket(
-                        resultedAddress.getHostName(), resultedAddress.getPort()));
+                if (serverConn.isActive()) {
+                  serverConn.getPlayer().getConnection().write(new TransferPacket(
+                      resultedAddress.getHostName(), resultedAddress.getPort()));
+                }
               }
             }, serverConn.ensureConnected().eventLoop());
     return true;
@@ -254,13 +278,17 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public void disconnected() {
-    resultFuture.completeExceptionally(
-        new IOException("Unexpectedly disconnected from remote server"));
+    final ConnectedPlayer player = serverConn.getPlayer();
+    if (player != null) {
+      player.teardown();
+    }
   }
 
   @Override
   public void handleGeneric(MinecraftPacket packet) {
-    serverConn.getPlayer().getConnection().write(packet);
+    if (serverConn.isActive()) {
+      serverConn.getPlayer().getConnection().write(packet);
+    }
   }
 
   private void switchFailure(Throwable cause) {

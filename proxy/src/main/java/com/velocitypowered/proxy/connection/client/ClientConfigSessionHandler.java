@@ -120,32 +120,28 @@ public class ClientConfigSessionHandler implements MinecraftSessionHandler {
       // but at this time the backend server may not be ready
     } else if (serverConn != null) {
       serverConn.ensureConnected().write(packet.retain());
-    } else {
-      player.getConnection().write(packet.retain());
     }
     return true;
   }
 
   @Override
   public boolean handle(PingIdentifyPacket packet) {
-    final VelocityServerConnection serverConn = player.getConnectionInFlight();
-    if (serverConn != null) {
-      serverConn.ensureConnected().write(packet);
-    } else {
-      player.getConnection().write(packet);
+    if (player.getConnectionInFlight() != null) {
+      player.getConnectionInFlight().ensureConnected().write(packet);
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   @Override
   public boolean handle(KnownPacksPacket packet) {
-    final VelocityServerConnection serverConn = player.getConnectionInFlight();
-    if (serverConn != null) {
-      serverConn.ensureConnected().write(packet);
-    } else {
-      player.getConnection().write(packet);
+    if (player.getConnectionInFlight() != null) {
+      player.getConnectionInFlight().ensureConnected().write(packet);
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   @Override
@@ -198,7 +194,7 @@ public class ClientConfigSessionHandler implements MinecraftSessionHandler {
       final Long sentTime = serverConnection.getPendingPings().remove(packet.getRandomId());
       if (sentTime != null) {
         final MinecraftConnection smc = serverConnection.getConnection();
-        if (smc != null) {
+        if (smc != null && !smc.isClosed()) {
           player.setPing(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - sentTime));
           smc.write(packet);
           return true;

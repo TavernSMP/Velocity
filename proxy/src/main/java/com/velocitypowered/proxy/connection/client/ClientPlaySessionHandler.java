@@ -181,7 +181,7 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
       final Long sentTime = serverConnection.getPendingPings().remove(packet.getRandomId());
       if (sentTime != null) {
         final MinecraftConnection smc = serverConnection.getConnection();
-        if (smc != null) {
+        if (smc != null && !smc.isClosed()) {
           player.setPing(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - sentTime));
           smc.write(packet);
         }
