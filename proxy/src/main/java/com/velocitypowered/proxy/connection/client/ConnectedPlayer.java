@@ -990,9 +990,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         .isPlayerAddressLoggingEnabled();
     final String playerIp =
         isPlayerAddressLoggingEnabled ? getRemoteAddress().toString() : "<ip address withheld>";
-
     return "[connected player] " + profile.getName() + " (" + playerIp + ")";
-
   }
 
   @Override
