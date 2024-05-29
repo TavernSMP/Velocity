@@ -92,8 +92,7 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
 
     // Make sure the player is on the minimum version set in configuration or higher
     if (!versionCheck(mcConnection)) {
-      if (server.getConfiguration().isLogPlayerConnections()
-              && server.getConfiguration().isLogOfflineConnections()
+      if (server.getConfiguration().isLogOfflineConnections()
                   || (!server.getConfiguration().isLogMinimumVersion())) {
         return;
       }
@@ -126,7 +125,9 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
         return CompletableFuture.completedFuture(null);
       }
 
-      logger.info("{} has connected", player);
+      if (server.getConfiguration().isLogPlayerConnections()) {
+        logger.info("{} has connected", player);
+      }
 
       return server.getEventManager()
           .fire(new PermissionsSetupEvent(player, ConnectedPlayer.DEFAULT_PERMISSIONS))

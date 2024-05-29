@@ -622,7 +622,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   public void disconnect0(Component reason, boolean duringLogin) {
     Component translated = this.translateMessage(reason);
 
-    if (server.getConfiguration().isLogPlayerConnections()) {
+    if (server.getConfiguration().isLogPlayerDisconnections()) {
       logger.info(Component.text(this + " has disconnected: ").append(translated));
     }
     connection.closeWith(DisconnectPacket.create(translated,
@@ -990,7 +990,9 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         .isPlayerAddressLoggingEnabled();
     final String playerIp =
         isPlayerAddressLoggingEnabled ? getRemoteAddress().toString() : "<ip address withheld>";
+
     return "[connected player] " + profile.getName() + " (" + playerIp + ")";
+
   }
 
   @Override

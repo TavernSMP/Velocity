@@ -94,6 +94,10 @@ public class VelocityConfiguration implements ProxyConfig {
   @Expose
   private boolean forceKeyAuthentication = true; // Added in 1.19
   @Expose
+  private boolean logPlayerConnections = true;
+  @Expose
+  private boolean logPlayerDisconnections = true;
+  @Expose
   private boolean logOfflineConnections = true;
   @Expose
   private boolean disableForge = false;
@@ -121,6 +125,7 @@ public class VelocityConfiguration implements ProxyConfig {
       boolean onlineModeKickExistingPlayers, PingPassthroughMode pingPassthrough,
       boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
       Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
+      boolean logPlayerConnections, boolean logPlayerDisconnections,
       boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning,
       boolean translateHeaderFooter, boolean logMinimumVersion, String minimumVersion) {
     this.bind = bind;
@@ -140,6 +145,8 @@ public class VelocityConfiguration implements ProxyConfig {
     this.query = query;
     this.metrics = metrics;
     this.forceKeyAuthentication = forceKeyAuthentication;
+    this.logPlayerConnections = logPlayerConnections;
+    this.logPlayerDisconnections = logPlayerDisconnections;
     this.logOfflineConnections = logOfflineConnections;
     this.disableForge = disableForge;
     this.enforceChatSigning = enforceChatSigning;
@@ -417,10 +424,6 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.isLogCommandExecutions();
   }
 
-  public boolean isLogPlayerConnections() {
-    return advanced.isLogPlayerConnections();
-  }
-
   public boolean isAcceptTransfers() {
     return this.advanced.isAcceptTransfers();
   }
@@ -466,6 +469,8 @@ public class VelocityConfiguration implements ProxyConfig {
         .add("favicon", favicon)
         .add("enablePlayerAddressLogging", enablePlayerAddressLogging)
         .add("forceKeyAuthentication", forceKeyAuthentication)
+        .add("logPlayerConnections", logPlayerConnections)
+        .add("logPlayerDisconnections", logPlayerDisconnections)
         .add("logOfflineConnections", logOfflineConnections)
         .add("disableForge", disableForge)
         .add("enforceChatSigning", enforceChatSigning)
@@ -563,6 +568,10 @@ public class VelocityConfiguration implements ProxyConfig {
       final boolean kickExisting = config.getOrElse("kick-existing-players", false);
       final boolean enablePlayerAddressLogging = config.getOrElse(
               "enable-player-address-logging", true);
+      final boolean logPlayerConnections = config.getOrElse(
+              "log-player-connections", true);
+      final boolean logPlayerDisconnections = config.getOrElse(
+              "log-player-disconnections", true);
       final boolean logOfflineConnections = config.getOrElse(
               "log-offline-connections", false);
       final boolean disableForge = config.getOrElse("disable-forge", true);
@@ -600,6 +609,8 @@ public class VelocityConfiguration implements ProxyConfig {
               new Query(queryConfig),
               new Metrics(metricsConfig),
               forceKeyAuthentication,
+              logPlayerConnections,
+              logPlayerDisconnections,
               logOfflineConnections,
               disableForge,
               enforceChatSigning,
@@ -628,6 +639,14 @@ public class VelocityConfiguration implements ProxyConfig {
 
   public boolean isOnlineModeKickExistingPlayers() {
     return onlineModeKickExistingPlayers;
+  }
+
+  public boolean isLogPlayerConnections() {
+    return logPlayerConnections;
+  }
+
+  public boolean isLogPlayerDisconnections() {
+    return logPlayerDisconnections;
   }
 
   public boolean isLogOfflineConnections() {
@@ -810,8 +829,6 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean logCommandExecutions = false;
     @Expose
-    private boolean logPlayerConnections = true;
-    @Expose
     private boolean acceptTransfers = false;
     @Expose
     private boolean allowIllegalCharactersInChat = false;
@@ -844,7 +861,6 @@ public class VelocityConfiguration implements ProxyConfig {
             .getOrElse("failover-on-unexpected-server-disconnect", true);
         this.announceProxyCommands = config.getOrElse("announce-proxy-commands", true);
         this.logCommandExecutions = config.getOrElse("log-command-executions", false);
-        this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
         this.allowIllegalCharactersInChat = config.getOrElse("allow-illegal-characters-in-chat", false);
         this.serverBrand = config.getOrElse("server-brand", "{0} ({1})");
@@ -905,10 +921,6 @@ public class VelocityConfiguration implements ProxyConfig {
       return logCommandExecutions;
     }
 
-    public boolean isLogPlayerConnections() {
-      return logPlayerConnections;
-    }
-
     public boolean isAcceptTransfers() {
       return this.acceptTransfers;
     }
@@ -936,7 +948,6 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", failoverOnUnexpectedServerDisconnect=" + failoverOnUnexpectedServerDisconnect
           + ", announceProxyCommands=" + announceProxyCommands
           + ", logCommandExecutions=" + logCommandExecutions
-          + ", logPlayerConnections=" + logPlayerConnections
           + ", acceptTransfers=" + acceptTransfers
           + ", allowIllegalCharactersInChat=" + allowIllegalCharactersInChat
           + '}';

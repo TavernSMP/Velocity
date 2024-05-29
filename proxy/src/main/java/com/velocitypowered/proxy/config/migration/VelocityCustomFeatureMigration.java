@@ -27,6 +27,8 @@ import org.apache.logging.log4j.Logger;
  * Creation of the configuration option "enforce-chat-signing".
  * Creation of the configuration option "fallback-version-ping".
  * Creation of the configuration option "log-offline-connections".
+ * Creation of the configuration option "log-player-connections".
+ * Creation of the configuration option "log-player-disconnections".
  * Creation of the configuration option "minimum-version".
  * Creation of the configuration option "outdated-version-ping".
  * Creation of the configuration option "server-brand".
@@ -62,6 +64,16 @@ public final class VelocityCustomFeatureMigration implements ConfigurationMigrat
     config.set("log-offline-connections", true);
     config.setComment("log-offline-connections", """
             If false, disables logging for offline player connections.""");
+    // Disables the logging of user connections
+    config.set("log-player-connections", true);
+    config.setComment("log-player-connections", """
+            Enables logging of player connections and by default, still displays
+            player disconnections and initial connections.""");
+    // Disables the logging of user disconnections
+    config.set("log-player-disconnections", true);
+    config.setComment("log-player-disconnections", """
+            Enables logging of player disconnection and by default, still displays
+            player connections and initial connections.""");
     // A performance-based feature that doesn't process header and footer components for better performance
     config.set("translate-header-footer", true);
     config.setComment("translate-header-footer", """

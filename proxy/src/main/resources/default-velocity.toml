@@ -89,6 +89,14 @@ enable-player-address-logging = true
 # If false, disables logging for offline player connections.
 log-offline-connections = true
 
+# Enables logging of player connections and by default, still displays
+# player disconnections and initial connections.
+log-player-connections = true
+
+# Enables logging of player disconnection and by default, still displays
+# player connections and initial connections.
+log-player-disconnections = true
+
 [servers]
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.
@@ -160,10 +168,6 @@ announce-proxy-commands = true
 
 # Enables the logging of commands
 log-command-executions = false
-
-# Enables logging of player connections when connecting to the proxy, switching servers
-# and disconnecting from the proxy.
-log-player-connections = true
 
 # Allows players transferred from other hosts via the
 # Transfer packet (Minecraft 1.20.5) to be received.
