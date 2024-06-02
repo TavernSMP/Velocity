@@ -224,7 +224,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   @EnsuresNonNull({"serverKeyPair", "servers", "pluginManager", "eventManager", "scheduler",
-      "console", "cm", "configuration"})
+                   "console", "cm", "configuration"})
   void start() {
     logger.info("Booting up {} {}...", getVersion().getName(), getVersion().getVersion());
     console.setupStreams();
@@ -296,6 +296,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   private void registerTranslations(boolean log) {
+    final String defaultFile = "messages.properties";
     final TranslationRegistry translationRegistry = new VelocityTranslationRegistry(TranslationRegistry.create(this.translationRegistryKey));
     translationRegistry.defaultLocale(Locale.US);
     try {
@@ -306,64 +307,75 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
         final Path langPath = Path.of("lang");
 
-        try {
+        try (final Stream<Path> files = Files.walk(path)) {
           if (!Files.exists(langPath)) {
             Files.createDirectory(langPath);
-            try (final Stream<Path> files = Files.walk(path)) {
-              files.filter(Files::isRegularFile).forEach(file -> {
-                try {
-                  final Path langFile = langPath.resolve(file.getFileName().toString());
-                  if (!Files.exists(langFile)) {
-                    try (final InputStream is = Files.newInputStream(file)) {
-                      Files.copy(is, langFile);
-                    }
-                  }
-                } catch (IOException e) {
-                  logger.error("Encountered an I/O error whilst loading translations", e);
-                }
-              });
-            }
-          }
 
-          try (final Stream<Path> files = Files.walk(langPath)) {
             files.filter(Files::isRegularFile).forEach(file -> {
-              final String filename = com.google.common.io.Files
-                      .getNameWithoutExtension(file.getFileName().toString());
-              final String localeName = filename.replace("messages_", "")
-                      .replace("messages", "")
-                      .replace('_', '-');
-              final Locale locale = localeName.isBlank()
-                      ? Locale.US
-                      : Locale.forLanguageTag(localeName);
-
-              try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                final ResourceBundle bundle = new PropertyResourceBundle(reader);
-                final Set<String> keys = bundle.keySet();
-
-                for (final String key : keys) {
-                  translationRegistry.unregister(key);
-
-                  final String format = bundle.getString(key);
-                  final String escapedFormat = format.replace("'", "''");
-                  final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
-
-                  translationRegistry.register(key, locale, messageFormat);
+              try {
+                final Path langFile = langPath.resolve(file.getFileName().toString());
+                if (!Files.exists(langFile)) {
+                  try (final InputStream is = Files.newInputStream(file)) {
+                    Files.copy(is, langFile);
+                  }
                 }
-              } catch (final IOException ignored) {
-                //ignored
+              } catch (IOException e) {
+                logger.error("Encountered an I/O error whilst loading translations", e);
               }
-              ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
             });
           }
 
-        } catch (IOException e) {
-          logger.error("Encountered an I/O error whilst loading translations", e);
+          final Optional<Path> optionalPath = files.filter(temp -> temp.toString().endsWith(defaultFile)).findFirst();
+
+          if (optionalPath.isEmpty()) {
+            logger.error("Failed to read default file, make a ticket @ discord.gg/beer (default file is missing)");
+            return;
+          }
+
+          try (final BufferedReader defaultReader = Files.newBufferedReader(optionalPath.get(), StandardCharsets.UTF_8)) {
+            final ResourceBundle defaultBundle = new PropertyResourceBundle(defaultReader);
+            final Set<String> defaultKeys = defaultBundle.keySet();
+
+            try (final Stream<Path> langFiles = Files.walk(langPath)) {
+              langFiles.filter(Files::isRegularFile).forEach(file -> {
+                final String filename = com.google.common.io.Files
+                    .getNameWithoutExtension(file.getFileName().toString());
+                final String localeName = filename.replace("messages_", "")
+                    .replace("messages", "")
+                    .replace('_', '-');
+                final Locale locale = localeName.isBlank()
+                                      ? Locale.US
+                                      : Locale.forLanguageTag(localeName);
+
+                try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+                  final ResourceBundle bundle = new PropertyResourceBundle(reader);
+
+                  translationRegistry.registerAll(locale, defaultKeys, (key) -> {
+                    final String format = bundle.containsKey(key) ? bundle.getString(key) : defaultBundle.getString(key);
+                    final String escapedFormat = format.replace("'", "''");
+                    final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
+
+                    return messageFormat;
+                  });
+
+                  ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
+                } catch (Exception e) {
+                  logger.error("Could not read language file: " + filename, e);
+                }
+              });
+            } catch (Exception e) {
+              logger.error("Failed to read directory: " + path.toString(), e);
+            }
+          }
+        } catch (Exception e) {
+          logger.error("An unknown exception occurred.", e);
         }
       }, "com", "velocitypowered", "proxy", "l10n");
     } catch (IOException e) {
       logger.error("Encountered an I/O error whilst loading translations", e);
       return;
     }
+
     GlobalTranslator.translator().addSource(translationRegistry);
   }
 
@@ -375,7 +387,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
       if (!configuration.validate()) {
         logger.error("Your configuration is invalid. Velocity will not start up until the errors "
-            + "are resolved.");
+                     + "are resolved.");
         LogManager.shutdown();
         System.exit(1);
       }
@@ -471,7 +483,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
         for (Player player : rs.get().getPlayersConnected()) {
           if (!(player instanceof ConnectedPlayer)) {
             throw new IllegalStateException("ConnectedPlayer not found for player " + player
-                + " in server " + rs.get().getServerInfo().getName());
+                                            + " in server " + rs.get().getServerInfo().getName());
           }
           evacuate.add((ConnectedPlayer) player);
         }
@@ -490,14 +502,14 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
               .whenComplete((success, ex) -> {
                 if (ex != null || success == null || !success) {
                   player.disconnect(Component.text("Your server has been changed, but we could "
-                      + "not move you to any fallback servers."));
+                                                   + "not move you to any fallback servers."));
                 }
                 latch.countDown();
               });
         } else {
           latch.countDown();
           player.disconnect(Component.text("Your server has been changed, but we could "
-              + "not move you to any fallback servers."));
+                                           + "not move you to any fallback servers."));
         }
       }
       try {
@@ -568,8 +580,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
           // makes sure that all the disconnect events are being fired
 
           CompletableFuture<Void> playersTeardownFuture = CompletableFuture.allOf(players.stream()
-                  .map(ConnectedPlayer::getTeardownFuture)
-                  .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
+              .map(ConnectedPlayer::getTeardownFuture)
+              .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
 
           playersTeardownFuture.get(10, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -654,7 +666,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     }
     String lowerName = connection.getUsername().toLowerCase(Locale.US);
     return !(connectionsByName.containsKey(lowerName)
-        || connectionsByUuid.containsKey(connection.getUniqueId()));
+             || connectionsByUuid.containsKey(connection.getUniqueId()));
   }
 
   /**
