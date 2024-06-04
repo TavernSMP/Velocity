@@ -198,6 +198,12 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
     }
     MinecraftConnection smc = serverConn.ensureConnected();
     ConnectedPlayer player = serverConn.getPlayer();
+
+    if (!(player.getConnection().getActiveSessionHandler() instanceof ClientConfigSessionHandler)) {
+      logger.error("Player hasn't established a full connection yet.");
+      return false;
+    }
+
     ClientConfigSessionHandler configHandler =
         (ClientConfigSessionHandler) player.getConnection().getActiveSessionHandler();
 

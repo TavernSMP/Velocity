@@ -573,6 +573,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
 
   @Override
   public ConnectionRequestBuilder createConnectionRequest(RegisteredServer server) {
+    if (this.connectedServer != null) {
+      if (this.connectedServer.getServerInfo().getAddress().equals(server.getServerInfo().getAddress())) {
+        return new ConnectionRequestBuilderImpl(this.connectedServer.getServer(), this.connectedServer);
+      }
+    }
+
     return new ConnectionRequestBuilderImpl(server, this.connectedServer);
   }
 
@@ -1357,6 +1363,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       return this.getInitialStatus().thenCompose(initialCheck -> {
         if (initialCheck.isPresent()) {
           return completedFuture(plainResult(initialCheck.get(), toConnect));
+        }
+
+        if (connection.getState() == StateRegistry.LOGIN && previousServer == null) {
+          logger.error("Terminating send to " + toConnect.getServerInfo().getName() + " as " + getGameProfile().getName() + " isn't connected yet.");
+          return completedFuture(
+              plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
         }
 
         ServerPreConnectEvent event =
