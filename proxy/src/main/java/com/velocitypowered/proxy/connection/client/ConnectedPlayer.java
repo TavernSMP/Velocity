@@ -585,7 +585,6 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         return new ConnectionRequestBuilderImpl(this.connectedServer.getServer(), this.connectedServer);
       }
     }
-
     return new ConnectionRequestBuilderImpl(server, this.connectedServer);
   }
 
@@ -623,7 +622,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   }
 
   /**
-   * Updates the state for listeners that cannot be ran at the current connection phrase.
+   * Updates the state for listeners that cannot be ran at the current connection phase.
    */
   @Internal
   public void updateState(@NotNull StateRegistry state) {
@@ -771,7 +770,6 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       // /!\ IT IS UNSAFE TO CONTINUE /!\
       //
       // This is usually triggered by a failed Forge handshake.
-
       disconnect(friendlyReason);
       return;
     }

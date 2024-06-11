@@ -224,7 +224,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   @EnsuresNonNull({"serverKeyPair", "servers", "pluginManager", "eventManager", "scheduler",
-                   "console", "cm", "configuration"})
+      "console", "cm", "configuration"})
   void start() {
     logger.info("Booting up {} {}...", getVersion().getName(), getVersion().getVersion());
     console.setupStreams();
@@ -375,7 +375,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       logger.error("Encountered an I/O error whilst loading translations", e);
       return;
     }
-
     GlobalTranslator.translator().addSource(translationRegistry);
   }
 
@@ -387,7 +386,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
       if (!configuration.validate()) {
         logger.error("Your configuration is invalid. Velocity will not start up until the errors "
-                     + "are resolved.");
+            + "are resolved.");
         LogManager.shutdown();
         System.exit(1);
       }
@@ -483,7 +482,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
         for (Player player : rs.get().getPlayersConnected()) {
           if (!(player instanceof ConnectedPlayer)) {
             throw new IllegalStateException("ConnectedPlayer not found for player " + player
-                                            + " in server " + rs.get().getServerInfo().getName());
+                + " in server " + rs.get().getServerInfo().getName());
           }
           evacuate.add((ConnectedPlayer) player);
         }
@@ -502,14 +501,14 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
               .whenComplete((success, ex) -> {
                 if (ex != null || success == null || !success) {
                   player.disconnect(Component.text("Your server has been changed, but we could "
-                                                   + "not move you to any fallback servers."));
+                      + "not move you to any fallback servers."));
                 }
                 latch.countDown();
               });
         } else {
           latch.countDown();
           player.disconnect(Component.text("Your server has been changed, but we could "
-                                           + "not move you to any fallback servers."));
+              + "not move you to any fallback servers."));
         }
       }
       try {
@@ -580,8 +579,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
           // makes sure that all the disconnect events are being fired
 
           CompletableFuture<Void> playersTeardownFuture = CompletableFuture.allOf(players.stream()
-              .map(ConnectedPlayer::getTeardownFuture)
-              .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
+                  .map(ConnectedPlayer::getTeardownFuture)
+                  .toArray((IntFunction<CompletableFuture<Void>[]>) CompletableFuture[]::new));
 
           playersTeardownFuture.get(10, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -666,7 +665,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     }
     String lowerName = connection.getUsername().toLowerCase(Locale.US);
     return !(connectionsByName.containsKey(lowerName)
-             || connectionsByUuid.containsKey(connection.getUniqueId()));
+        || connectionsByUuid.containsKey(connection.getUniqueId()));
   }
 
   /**
