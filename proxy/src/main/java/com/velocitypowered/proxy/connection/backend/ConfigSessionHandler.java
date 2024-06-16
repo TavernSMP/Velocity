@@ -29,7 +29,7 @@ import com.velocitypowered.proxy.connection.MinecraftConnection;
 import com.velocitypowered.proxy.connection.MinecraftSessionHandler;
 import com.velocitypowered.proxy.connection.client.ClientConfigSessionHandler;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
-import com.velocitypowered.proxy.connection.player.VelocityResourcePackInfo;
+import com.velocitypowered.proxy.connection.player.resourcepack.VelocityResourcePackInfo;
 import com.velocitypowered.proxy.connection.util.ConnectionMessages;
 import com.velocitypowered.proxy.connection.util.ConnectionRequestResults;
 import com.velocitypowered.proxy.connection.util.ConnectionRequestResults.Impl;
@@ -88,9 +88,6 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public void activated() {
-    if (!serverConn.isActive()) {
-      return;
-    }
     ConnectedPlayer player = serverConn.getPlayer();
     if (player.getProtocolVersion() == ProtocolVersion.MINECRAFT_1_20_2) {
       resourcePackToApply = player.resourcePackHandler().getFirstAppliedPack();
@@ -110,20 +107,14 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(StartUpdatePacket packet) {
-    if (!serverConn.isActive()) {
-      return false;
-    }
     serverConn.ensureConnected().write(packet);
     return true;
   }
 
   @Override
   public boolean handle(TagsUpdatePacket packet) {
-    if (serverConn.isActive()) {
-      serverConn.getPlayer().getConnection().write(packet);
-      return true;
-    }
-    return false;
+    serverConn.getPlayer().getConnection().write(packet);
+    return true;
   }
 
   @Override
@@ -140,18 +131,13 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(KeepAlivePacket packet) {
-    if (serverConn.isActive()) {
-      serverConn.ensureConnected().write(packet);
-      return true;
-    }
-    return false;
+    serverConn.getPendingPings().put(packet.getRandomId(), System.nanoTime());
+    serverConn.getPlayer().getConnection().write(packet);
+    return true;
   }
 
   @Override
   public boolean handle(final ResourcePackRequestPacket packet) {
-    if (!serverConn.isActive()) {
-      return false;
-    }
     final MinecraftConnection playerConnection = serverConn.getPlayer().getConnection();
 
     final ResourcePackInfo resourcePackInfo = packet.toServerPromptedPack();
@@ -207,39 +193,31 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(FinishedUpdatePacket packet) {
-    if (!serverConn.isActive()) {
-      return false;
-    }
-    MinecraftConnection smc = serverConn.ensureConnected();
-    ConnectedPlayer player = serverConn.getPlayer();
+    final MinecraftConnection smc = serverConn.ensureConnected();
+    final ConnectedPlayer player = serverConn.getPlayer();
 
     if (!(player.getConnection().getActiveSessionHandler() instanceof ClientConfigSessionHandler)) {
       logger.error("Player hasn't established a full connection yet.");
       return false;
     }
 
-    ClientConfigSessionHandler configHandler =
-        (ClientConfigSessionHandler) player.getConnection().getActiveSessionHandler();
+    final ClientConfigSessionHandler configHandler = (ClientConfigSessionHandler) player.getConnection().getActiveSessionHandler();
 
-    smc.setAutoReading(false);
-    // Even when not auto reading messages are still decoded. Decode them with the correct state
     smc.getChannel().pipeline().get(MinecraftDecoder.class).setState(StateRegistry.PLAY);
-    configHandler.handleBackendFinishUpdate(serverConn).thenAcceptAsync((unused) -> {
+    //noinspection DataFlowIssue
+    configHandler.handleBackendFinishUpdate(serverConn).thenRunAsync(() -> {
+      smc.write(FinishedUpdatePacket.INSTANCE);
       if (serverConn == player.getConnectedServer()) {
         smc.setActiveSessionHandler(StateRegistry.PLAY);
-        player.sendPlayerListHeaderAndFooter(
-            player.getPlayerListHeader(), player.getPlayerListFooter());
+        player.sendPlayerListHeaderAndFooter(player.getPlayerListHeader(), player.getPlayerListFooter());
         // The client cleared the tab list. TODO: Restore changes done via TabList API
         player.getTabList().clearAllSilent();
       } else {
-        smc.setActiveSessionHandler(StateRegistry.PLAY,
-            new TransitionSessionHandler(server, serverConn, resultFuture));
+        smc.setActiveSessionHandler(StateRegistry.PLAY, new TransitionSessionHandler(server, serverConn, resultFuture));
       }
-      if (player.resourcePackHandler().getFirstAppliedPack() == null
-              && resourcePackToApply != null) {
+      if (player.resourcePackHandler().getFirstAppliedPack() == null && resourcePackToApply != null) {
         player.resourcePackHandler().queueResourcePack(resourcePackToApply);
       }
-      smc.setAutoReading(true);
     }, smc.eventLoop());
     return true;
   }
@@ -247,9 +225,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
   @Override
   public boolean handle(DisconnectPacket packet) {
     serverConn.disconnect();
-    if (!resultFuture.isDone()) {
-      resultFuture.complete(ConnectionRequestResults.forDisconnect(packet, serverConn.getServer()));
-    }
+    resultFuture.complete(ConnectionRequestResults.forDisconnect(packet, serverConn.getServer()));
     return true;
   }
 
@@ -281,9 +257,6 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
           from Backend Server in Configuration State""");
       return true;
     }
-    if (!serverConn.isActive()) {
-      return false;
-    }
     this.server.getEventManager()
             .fire(new PreTransferEvent(this.serverConn.getPlayer(), originalAddress))
             .thenAcceptAsync(event -> {
@@ -292,10 +265,8 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
                 if (resultedAddress == null) {
                   resultedAddress = originalAddress;
                 }
-                if (serverConn.isActive()) {
-                  serverConn.getPlayer().getConnection().write(new TransferPacket(
-                      resultedAddress.getHostName(), resultedAddress.getPort()));
-                }
+                serverConn.getPlayer().getConnection().write(new TransferPacket(
+                        resultedAddress.getHostName(), resultedAddress.getPort()));
               }
             }, serverConn.ensureConnected().eventLoop());
     return true;
@@ -345,9 +316,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public void handleGeneric(MinecraftPacket packet) {
-    if (serverConn.isActive()) {
-      serverConn.getPlayer().getConnection().write(packet);
-    }
+    serverConn.getPlayer().getConnection().write(packet);
   }
 
   private void switchFailure(Throwable cause) {
