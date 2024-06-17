@@ -82,8 +82,6 @@ public class PlayPacketQueueOutboundHandler extends ChannelDuplexHandler {
   @Override
   public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
     this.releaseQueue(ctx, ctx.channel().isActive());
-
-    super.handlerRemoved(ctx);
   }
 
   private void releaseQueue(ChannelHandlerContext ctx, boolean active) {

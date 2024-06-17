@@ -307,7 +307,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
         final Path langPath = Path.of("lang");
 
-        try (final Stream<Path> files = Files.walk(path)) {
+        try (Stream<Path> files = Files.walk(path)) {
           if (!Files.exists(langPath)) {
             Files.createDirectory(langPath);
 
@@ -325,10 +325,13 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
             });
           }
 
-          final Optional<Path> optionalPath = files.filter(temp -> temp.toString().endsWith(defaultFile)).findFirst();
+          Optional<Path> optionalPath;
+          try (Stream<Path> defaultFiles = Files.walk(path)) {
+            optionalPath = defaultFiles.filter(temp -> temp.toString().endsWith(defaultFile)).findFirst();
+          }
 
           if (optionalPath.isEmpty()) {
-            logger.error("Failed to read default file, make a ticket @ discord.gg/beer (default file is missing)");
+            logger.error("Encountered an error when attempting to read default translations)");
             return;
           }
 

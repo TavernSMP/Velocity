@@ -139,7 +139,6 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
         logger.info("{} has disconnected", association);
       }
     }
-    super.channelInactive(ctx);
   }
 
   @Override
