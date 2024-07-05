@@ -47,7 +47,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
     if (packet.lastSeenMessages == null) {
       return null;
     }
-    if (packet.isSigned()) {
+    if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
       // Any signed message produced by the client *must* be passed through to the server in order to maintain a
       // consistent state for future messages.
       logger.fatal("A plugin tried to deny a command with signable component(s). "
@@ -77,7 +77,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
 
   @Nullable
   private MinecraftPacket modifyCommand(SessionPlayerCommandPacket packet, String newCommand) {
-    if (packet.isSigned()) {
+    if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
       logger.fatal("A plugin tried to change a command with signed component(s). "
           + "This is not supported. "
           + "Disconnecting player " + player.getUsername() + ". Command packet: " + packet);

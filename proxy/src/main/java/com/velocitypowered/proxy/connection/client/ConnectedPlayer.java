@@ -96,10 +96,11 @@ import com.velocitypowered.proxy.tablist.VelocityTabList;
 import com.velocitypowered.proxy.tablist.VelocityTabListLegacy;
 import com.velocitypowered.proxy.util.ClosestLocaleMatcher;
 import com.velocitypowered.proxy.util.DurationUtils;
-import com.velocitypowered.proxy.util.TranslatableMapper;
+import com.velocitypowered.proxy.util.translation.TranslatableMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -123,6 +124,7 @@ import net.kyori.adventure.resource.ResourcePackInfoLike;
 import net.kyori.adventure.resource.ResourcePackRequest;
 import net.kyori.adventure.resource.ResourcePackRequestLike;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -187,6 +189,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   private @Nullable ClientSettingsPacket clientSettingsPacket;
   private final ChatQueue chatQueue;
   private final ChatBuilderFactory chatBuilderFactory;
+  private final List<String> attemptedServers;
 
   ConnectedPlayer(VelocityServer server, GameProfile profile, MinecraftConnection connection,
                   @Nullable InetSocketAddress virtualHost, boolean onlineMode,
@@ -198,6 +201,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     this.permissionFunction = PermissionFunction.ALWAYS_UNDEFINED;
     this.connectionPhase = connection.getType().getInitialClientPhase();
     this.onlineMode = onlineMode;
+    this.attemptedServers = new ArrayList<>();
 
     if (connection.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19_3)) {
       this.tabList = new VelocityTabList(this);
@@ -219,6 +223,10 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     for (final VelocityBossBarImplementation bar : this.bossBars) {
       bar.viewerDisconnected(this);
     }
+  }
+
+  public List<String> getAttemptedServers() {
+    return attemptedServers;
   }
 
   public ChatBuilderFactory getChatBuilderFactory() {
@@ -394,7 +402,8 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     Preconditions.checkNotNull(message, "message");
     Preconditions.checkNotNull(type, "type");
 
-    Component translated = translateMessage(message);
+    Component translated = translateMessage(message)
+        .replaceText(TextReplacementConfig.builder().match("''").replacement("'").build());
 
     connection.write(getChatBuilderFactory().builder()
         .component(translated).forIdentity(identity)
@@ -449,8 +458,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   @Override
   public void sendPlayerListHeaderAndFooter(final @NotNull Component header,
                                             final @NotNull Component footer) {
-    Component translatedHeader = translateMessage(header);
-    Component translatedFooter = translateMessage(footer);
+    Component translatedHeader = header;
+    Component translatedFooter = footer;
+    if (server.getConfiguration().isTranslateHeaderFooter()) {
+      translatedHeader = translateMessage(header);
+      translatedFooter = translateMessage(footer);
+    }
     this.playerListHeader = translatedHeader;
     this.playerListFooter = translatedFooter;
     if (this.getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_8)) {
@@ -565,6 +578,11 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
 
   @Override
   public ConnectionRequestBuilder createConnectionRequest(RegisteredServer server) {
+    if (this.connectedServer != null) {
+      if (this.connectedServer.getServerInfo().getAddress().equals(server.getServerInfo().getAddress())) {
+        return new ConnectionRequestBuilderImpl(this.connectedServer.getServer(), this.connectedServer);
+      }
+    }
     return new ConnectionRequestBuilderImpl(server, this.connectedServer);
   }
 
@@ -619,7 +637,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   public void disconnect0(Component reason, boolean duringLogin) {
     Component translated = this.translateMessage(reason);
 
-    if (server.getConfiguration().isLogPlayerConnections()) {
+    if (server.getConfiguration().isLogPlayerDisconnections()) {
       logger.info(Component.text(this + " has disconnected: ").append(translated));
     }
     connection.closeWith(DisconnectPacket.create(translated,
@@ -853,6 +871,41 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       if (connOrder.isEmpty()) {
         return Optional.empty();
       } else {
+        if (server.getConfiguration().isEnableDynamicFallbacks()) {
+          Optional<RegisteredServer> emptiestServer = Optional.empty();
+          int index = 0;
+          for (String serverName : connOrder) {
+            if (attemptedServers.contains(serverName)) {
+              continue;
+            }
+
+            RegisteredServer registeredServer = server.getServer(serverName).orElse(null);
+            if (registeredServer == null) {
+              logger.error(Component.text("Unable to read your velocity.toml fallback servers. Users are unable to connect."));
+              return emptiestServer;
+            }
+
+            if ((connectedServer != null && hasSameName(connectedServer.getServer(), serverName))
+                    || (connectionInFlight != null && hasSameName(connectionInFlight.getServer(), serverName))
+                    || (current != null && hasSameName(current, serverName))) {
+              continue;
+            }
+
+            if (emptiestServer.isEmpty()) {
+              index = connOrder.indexOf(serverName);
+              emptiestServer = Optional.of(registeredServer);
+            } else {
+              if (registeredServer.getPlayersConnected().size() < emptiestServer.get().getPlayersConnected().size()) {
+                index = connOrder.indexOf(serverName);
+                emptiestServer = Optional.of(registeredServer);
+              }
+            }
+          }
+
+          emptiestServer.ifPresent(registeredServer -> attemptedServers.add(registeredServer.getServerInfo().getName()));
+          tryIndex = index;
+          return emptiestServer;
+        }
         serversToTry = connOrder;
       }
     }
@@ -907,7 +960,14 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     return mc;
   }
 
-  void teardown() {
+  /**
+   * Disconnects any ongoing or established connections.
+   * This method ensures that any connection currently in flight or
+   * any connected server is properly disconnected to clean up resources
+   * and prevent potential memory leaks and is made public to "fix" the
+   * ongoing unexpected disconnection error for some users.
+   */
+  public void teardown() {
     if (connectionInFlight != null) {
       connectionInFlight.disconnect();
     }
@@ -1331,6 +1391,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
       return this.getInitialStatus().thenCompose(initialCheck -> {
         if (initialCheck.isPresent()) {
           return completedFuture(plainResult(initialCheck.get(), toConnect));
+        }
+
+        if (connection.getState() == StateRegistry.LOGIN && previousServer == null) {
+          logger.error("Terminating send to " + toConnect.getServerInfo().getName() + " as " + getGameProfile().getName() + " isn't connected yet.");
+          return completedFuture(
+                  plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
         }
 
         ServerPreConnectEvent event =
