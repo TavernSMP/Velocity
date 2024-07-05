@@ -55,6 +55,7 @@ import com.velocitypowered.proxy.protocol.packet.ServerboundCookieResponsePacket
 import com.velocitypowered.proxy.protocol.packet.TabCompleteRequestPacket;
 import com.velocitypowered.proxy.protocol.packet.TabCompleteResponsePacket;
 import com.velocitypowered.proxy.protocol.packet.TabCompleteResponsePacket.Offer;
+import com.velocitypowered.proxy.protocol.packet.chat.ChatAcknowledgementPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.ChatHandler;
 import com.velocitypowered.proxy.protocol.packet.chat.ChatTimeKeeper;
 import com.velocitypowered.proxy.protocol.packet.chat.CommandHandler;
@@ -101,7 +102,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class ClientPlaySessionHandler implements MinecraftSessionHandler {
 
   private static final Logger logger = LogManager.getLogger(ClientPlaySessionHandler.class);
-  private static final int MAX_STORED_LOGIN_PLUGIN_MESSAGES = 16384; // arbitrary choice
+  private static final int MAX_STORED_LOGIN_PLUGIN_MESSAGES = 16384;
 
   private final ConnectedPlayer player;
   private boolean spawned = false;
@@ -430,6 +431,15 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
       });
     }
     configSwitchFuture.complete(null);
+    return true;
+  }
+
+  @Override
+  public boolean handle(ChatAcknowledgementPacket packet) {
+    if (player.getCurrentServer().isEmpty()) {
+      return true;
+    }
+    player.getChatQueue().handleAcknowledgement(packet.offset());
     return true;
   }
 

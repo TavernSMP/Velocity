@@ -83,6 +83,7 @@ import com.velocitypowered.proxy.protocol.packet.chat.ChatType;
 import com.velocitypowered.proxy.protocol.packet.chat.ComponentHolder;
 import com.velocitypowered.proxy.protocol.packet.chat.PlayerChatCompletionPacket;
 import com.velocitypowered.proxy.protocol.packet.chat.builder.ChatBuilderFactory;
+import com.velocitypowered.proxy.protocol.packet.chat.builder.ChatBuilderV2;
 import com.velocitypowered.proxy.protocol.packet.chat.legacy.LegacyChatPacket;
 import com.velocitypowered.proxy.protocol.packet.config.ClientboundServerLinksPacket;
 import com.velocitypowered.proxy.protocol.packet.config.StartUpdatePacket;
@@ -1168,11 +1169,12 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         "input cannot be greater than " + LegacyChatPacket.MAX_SERVERBOUND_MESSAGE_LENGTH
             + " characters in length");
     if (getProtocolVersion().noLessThan(ProtocolVersion.MINECRAFT_1_19)) {
-      this.chatQueue.hijack(getChatBuilderFactory().builder().asPlayer(this).message(input),
-          (instant, item) -> {
-            item.setTimestamp(instant);
-            return item.toServer();
-          });
+      ChatBuilderV2 message = getChatBuilderFactory().builder().asPlayer(this).message(input);
+      this.chatQueue.queuePacket(chatState -> {
+        message.setTimestamp(chatState.lastTimestamp);
+        message.setLastSeenMessages(chatState.createLastSeen());
+        return message.toServer();
+      });
     } else {
       ensureBackendConnection().write(getChatBuilderFactory().builder()
           .asPlayer(this).message(input).toServer());
@@ -1394,7 +1396,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         if (connection.getState() == StateRegistry.LOGIN && previousServer == null) {
           logger.error("Terminating send to " + toConnect.getServerInfo().getName() + " as " + getGameProfile().getName() + " isn't connected yet.");
           return completedFuture(
-              plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
+                  plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
         }
 
         ServerPreConnectEvent event =
