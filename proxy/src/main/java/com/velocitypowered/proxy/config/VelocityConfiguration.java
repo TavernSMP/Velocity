@@ -573,7 +573,7 @@ public class VelocityConfiguration implements ProxyConfig {
       final boolean logPlayerDisconnections = config.getOrElse(
               "log-player-disconnections", true);
       final boolean logOfflineConnections = config.getOrElse(
-              "log-offline-connections", false);
+              "log-offline-connections", true);
       final boolean disableForge = config.getOrElse("disable-forge", true);
       final boolean enforceChatSigning = config.getOrElse(
               "enforce-chat-signing", false);
