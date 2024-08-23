@@ -239,7 +239,6 @@ public final class ConnectionManager {
    *
    * @return a shared HTTP client instance.
    */
-  @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public HttpClient createHttpClient() {
     return HttpClient.newBuilder()
             .executor(this.workerGroup)
