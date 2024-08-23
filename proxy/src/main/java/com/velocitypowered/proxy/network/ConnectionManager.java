@@ -235,9 +235,9 @@ public final class ConnectionManager {
   }
 
   /**
-   * Returns a shared HTTP client instance.
+   * Returns an HTTP client instance.
    *
-   * @return a shared HTTP client instance.
+   * @return an HTTP client instance.
    */
   public HttpClient createHttpClient() {
     return HttpClient.newBuilder()
