@@ -347,8 +347,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
                     .replace("messages", "")
                     .replace('_', '-');
                 final Locale locale = localeName.isBlank()
-                                      ? Locale.US
-                                      : Locale.forLanguageTag(localeName);
+                    ? Locale.US
+                    : Locale.forLanguageTag(localeName);
 
                 try (final BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
                   final ResourceBundle bundle = new PropertyResourceBundle(reader);

@@ -176,7 +176,7 @@ public class VelocityEventManager implements EventManager {
     }
   }
 
-  private HandlersCache bakeHandlers(final Class<?> eventType) {
+  private @Nullable HandlersCache bakeHandlers(final Class<?> eventType) {
     final List<HandlerRegistration> baked = new ArrayList<>();
     final Collection<Class<?>> types = eventTypeTracker.getFriendsOf(eventType);
 
@@ -187,6 +187,10 @@ public class VelocityEventManager implements EventManager {
       }
     } finally {
       lock.readLock().unlock();
+    }
+
+    if (baked.isEmpty()) {
+      return null;
     }
 
     baked.sort(handlerComparator);
