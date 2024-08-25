@@ -966,14 +966,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     return mc;
   }
 
-  /**
-   * Disconnects any ongoing or established connections.
-   * This method ensures that any connection currently in flight or
-   * any connected server is properly disconnected to clean up resources
-   * and prevent potential memory leaks and is made public to "fix" the
-   * ongoing unexpected disconnection error for some users.
-   */
-  public void teardown() {
+  void teardown() {
     if (connectionInFlight != null) {
       connectionInFlight.disconnect();
     }
@@ -1431,7 +1424,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         if (connection.getState() == StateRegistry.LOGIN && previousServer == null) {
           logger.error("Terminating send to " + toConnect.getServerInfo().getName() + " as " + getGameProfile().getName() + " isn't connected yet.");
           return completedFuture(
-                  plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
+                plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
         }
 
         ServerPreConnectEvent event =

@@ -339,9 +339,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
   @Override
   public void disconnected() {
     final ConnectedPlayer player = serverConn.getPlayer();
-    if (player != null) {
-      player.teardown();
-    }
+    player.getConnection().close();
   }
 
   @Override
