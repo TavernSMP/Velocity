@@ -62,7 +62,7 @@ public final class BackendConnectionPhases {
   public static final BackendConnectionPhase IN_TRANSITION = new BackendConnectionPhase() {
     @Override
     public boolean consideredComplete() {
-      return true;
+      return BackendConnectionPhase.super.consideredComplete();
     }
   };
 

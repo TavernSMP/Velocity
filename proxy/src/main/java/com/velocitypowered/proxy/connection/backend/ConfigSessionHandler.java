@@ -72,7 +72,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
 
   private ResourcePackInfo resourcePackToApply;
 
-  private State state;
+  final State state;
 
   /**
    * Creates the new transition handler.
@@ -226,15 +226,12 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
     final MinecraftConnection smc = serverConn.ensureConnected();
     final ConnectedPlayer player = serverConn.getPlayer();
 
-    if (!(player.getConnection().getActiveSessionHandler() instanceof ClientConfigSessionHandler)) {
+    if (!(player.getConnection().getActiveSessionHandler() instanceof ClientConfigSessionHandler configHandler)) {
       logger.error("Player hasn't established a full connection yet.");
       return false;
     }
 
-    final ClientConfigSessionHandler configHandler = (ClientConfigSessionHandler) player.getConnection().getActiveSessionHandler();
-
     smc.getChannel().pipeline().get(MinecraftDecoder.class).setState(StateRegistry.PLAY);
-    //noinspection DataFlowIssue
     configHandler.handleBackendFinishUpdate(serverConn).thenRunAsync(() -> {
       smc.write(FinishedUpdatePacket.INSTANCE);
       if (serverConn == player.getConnectedServer()) {

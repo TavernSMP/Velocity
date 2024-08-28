@@ -1066,7 +1066,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   }
 
   @Override
-  public void transferToHost(final InetSocketAddress address) {
+  public void transferToHost(final @NotNull InetSocketAddress address) {
     Preconditions.checkNotNull(address);
     Preconditions.checkArgument(
             this.getProtocolVersion().compareTo(ProtocolVersion.MINECRAFT_1_20_5) >= 0,
@@ -1309,11 +1309,10 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
    * Forwards the keep alive packet to the backend server it belongs to.
    * This is either the connection in flight or the connected server.
    */
-  public boolean forwardKeepAlive(final KeepAlivePacket packet) {
+  public void forwardKeepAlive(final KeepAlivePacket packet) {
     if (!this.sendKeepAliveToBackend(connectedServer, packet)) {
-      return this.sendKeepAliveToBackend(connectionInFlight, packet);
+      this.sendKeepAliveToBackend(connectionInFlight, packet);
     }
-    return false;
   }
 
   private boolean sendKeepAliveToBackend(final @Nullable VelocityServerConnection serverConnection, final @NotNull KeepAlivePacket packet) {
@@ -1429,7 +1428,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
         }
 
         if (connection.getState() == StateRegistry.LOGIN && previousServer == null) {
-          logger.error("Terminating send to " + toConnect.getServerInfo().getName() + " as " + getGameProfile().getName() + " isn't connected yet.");
+          logger.error("Terminating send to {} as {} isn't connected yet.", toConnect.getServerInfo().getName(), getGameProfile().getName());
           return completedFuture(
                 plainResult(ConnectionRequestBuilder.Status.CONNECTION_CANCELLED, toConnect));
         }

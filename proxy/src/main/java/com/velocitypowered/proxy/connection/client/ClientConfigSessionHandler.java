@@ -141,12 +141,14 @@ public class ClientConfigSessionHandler implements MinecraftSessionHandler {
 
   @Override
   public boolean handle(KnownPacksPacket packet) {
-    callConfigurationEvent().thenRun(() -> {
-      player.getConnectionInFlightOrConnectedServer().ensureConnected().write(packet);
-    }).exceptionally(ex -> {
-      logger.error("Error forwarding known packs response to backend:", ex);
-      return null;
-    });
+    callConfigurationEvent().thenRun(() ->
+        player.getConnectionInFlightOrConnectedServer()
+        .ensureConnected()
+        .write(packet))
+        .exceptionally(ex -> {
+          logger.error("Error forwarding known packs response to backend:", ex);
+          return null;
+        });
 
     return true;
   }
@@ -249,17 +251,15 @@ public class ClientConfigSessionHandler implements MinecraftSessionHandler {
       smc.write(brandPacket);
     }
 
-    callConfigurationEvent().thenCompose(v -> {
-      return server.getEventManager().fire(new PlayerFinishConfigurationEvent(player, serverConn))
-          .completeOnTimeout(null, 5, TimeUnit.SECONDS);
-    }).thenRunAsync(() -> {
-      player.getConnection().write(FinishedUpdatePacket.INSTANCE);
-      player.getConnection().getChannel().pipeline().get(MinecraftEncoder.class).setState(StateRegistry.PLAY);
-      server.getEventManager().fireAndForget(new PlayerFinishedConfigurationEvent(player, serverConn));
-    }, player.getConnection().eventLoop()).exceptionally(ex -> {
-      logger.error("Error finishing configuration state:", ex);
-      return null;
-    });
+    callConfigurationEvent().thenCompose(v -> server.getEventManager().fire(new PlayerFinishConfigurationEvent(player, serverConn))
+        .completeOnTimeout(null, 5, TimeUnit.SECONDS)).thenRunAsync(() -> {
+          player.getConnection().write(FinishedUpdatePacket.INSTANCE);
+          player.getConnection().getChannel().pipeline().get(MinecraftEncoder.class).setState(StateRegistry.PLAY);
+          server.getEventManager().fireAndForget(new PlayerFinishedConfigurationEvent(player, serverConn));
+        }, player.getConnection().eventLoop()).exceptionally(ex -> {
+          logger.error("Error finishing configuration state:", ex);
+          return null;
+        });
 
     return configSwitchFuture;
   }

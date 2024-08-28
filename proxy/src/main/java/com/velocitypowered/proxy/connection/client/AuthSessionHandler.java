@@ -198,7 +198,7 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
             }
           }
         } else {
-          logger.warn("A custom key type has been set for player " + player.getUsername());
+          logger.warn("A custom key type has been set for player {}", player.getUsername());
         }
       } else {
         if (!Objects.equals(playerKey.getSignatureHolder(), playerUniqueId)) {
@@ -220,12 +220,13 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
       loginState = State.ACKNOWLEDGED;
       mcConnection.setActiveSessionHandler(StateRegistry.CONFIG, new ClientConfigSessionHandler(server, connectedPlayer));
 
-      server.getEventManager().fire(new PostLoginEvent(connectedPlayer)).thenCompose(ignored -> {
-        return connectToInitialServer(connectedPlayer);
-      }).exceptionally((ex) -> {
-        logger.error("Exception while connecting {} to initial server", connectedPlayer, ex);
-        return null;
-      });
+      server.getEventManager()
+          .fire(new PostLoginEvent(connectedPlayer))
+          .thenCompose(ignored -> connectToInitialServer(connectedPlayer))
+          .exceptionally((ex) -> {
+            logger.error("Exception while connecting {} to initial server", connectedPlayer, ex);
+            return null;
+          });
     }
     return true;
   }
@@ -278,9 +279,7 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
         if (inbound.getProtocolVersion().lessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
           loginState = State.ACKNOWLEDGED;
           mcConnection.setActiveSessionHandler(StateRegistry.PLAY, new InitialConnectSessionHandler(player, server));
-          server.getEventManager().fire(new PostLoginEvent(player)).thenCompose((ignored) -> {
-            return connectToInitialServer(player);
-          }).exceptionally((ex) -> {
+          server.getEventManager().fire(new PostLoginEvent(player)).thenCompose((ignored) -> connectToInitialServer(player)).exceptionally((ex) -> {
             logger.error("Exception while connecting {} to initial server", player, ex);
             return null;
           });
