@@ -107,7 +107,7 @@ public enum TransportType {
       return NIO;
     }
 
-    if (Boolean.getBoolean("velocity.enable-iouring") && IOUring.isAvailable()) {
+    if (IOUring.isAvailable()) {
       return IO_URING;
     }
 
