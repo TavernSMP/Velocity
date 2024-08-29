@@ -19,6 +19,7 @@ package com.velocitypowered.proxy.connection.client;
 
 import static com.velocitypowered.api.proxy.ConnectionRequestBuilder.Status.ALREADY_CONNECTED;
 import static com.velocitypowered.proxy.connection.util.ConnectionRequestResults.plainResult;
+import static com.velocitypowered.proxy.util.TranslatableMapper.FLATTENER;
 import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
@@ -97,7 +98,6 @@ import com.velocitypowered.proxy.tablist.VelocityTabList;
 import com.velocitypowered.proxy.tablist.VelocityTabListLegacy;
 import com.velocitypowered.proxy.util.ClosestLocaleMatcher;
 import com.velocitypowered.proxy.util.DurationUtils;
-import com.velocitypowered.proxy.util.translation.TranslatableMapper;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import java.net.InetSocketAddress;
@@ -146,7 +146,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     VelocityInboundConnection {
 
   private static final PlainTextComponentSerializer PASS_THRU_TRANSLATE =
-      PlainTextComponentSerializer.builder().flattener(TranslatableMapper.FLATTENER).build();
+      PlainTextComponentSerializer.builder().flattener(FLATTENER).build();
   static final PermissionProvider DEFAULT_PERMISSIONS = s -> PermissionFunction.ALWAYS_UNDEFINED;
 
   private static final ComponentLogger logger = ComponentLogger.logger(ConnectedPlayer.class);
@@ -667,7 +667,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
    *
    * @param server    the server we disconnected from
    * @param throwable the exception
-   * @param safe      whether or not we can safely reconnect to a new server
+   * @param safe      whether we can safely reconnect to a new server
    */
   public void handleConnectionException(RegisteredServer server, Throwable throwable,
                                         boolean safe) {
@@ -706,7 +706,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
    *
    * @param server     the server we disconnected from
    * @param disconnect the disconnect packet
-   * @param safe       whether or not we can safely reconnect to a new server
+   * @param safe       whether we can safely reconnect to a new server
    */
   public void handleConnectionException(RegisteredServer server, DisconnectPacket disconnect,
                                         boolean safe) {
@@ -1309,10 +1309,11 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
    * Forwards the keep alive packet to the backend server it belongs to.
    * This is either the connection in flight or the connected server.
    */
-  public void forwardKeepAlive(final KeepAlivePacket packet) {
+  public boolean forwardKeepAlive(final KeepAlivePacket packet) {
     if (!this.sendKeepAliveToBackend(connectedServer, packet)) {
-      this.sendKeepAliveToBackend(connectionInFlight, packet);
+      return this.sendKeepAliveToBackend(connectionInFlight, packet);
     }
+    return false;
   }
 
   private boolean sendKeepAliveToBackend(final @Nullable VelocityServerConnection serverConnection, final @NotNull KeepAlivePacket packet) {

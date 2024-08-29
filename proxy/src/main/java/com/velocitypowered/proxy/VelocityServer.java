@@ -356,18 +356,17 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
                   translationRegistry.registerAll(locale, defaultKeys, (key) -> {
                     final String format = bundle.containsKey(key) ? bundle.getString(key) : defaultBundle.getString(key);
                     final String escapedFormat = format.replace("'", "''");
-                    final MessageFormat messageFormat = new MessageFormat(escapedFormat, locale);
 
-                    return messageFormat;
+                    return new MessageFormat(escapedFormat, locale);
                   });
 
                   ClosestLocaleMatcher.INSTANCE.registerKnown(locale);
                 } catch (Exception e) {
-                  logger.error("Could not read language file: " + filename, e);
+                  logger.error("Could not read language file: {}", filename, e);
                 }
               });
             } catch (Exception e) {
-              logger.error("Failed to read directory: " + path.toString(), e);
+              logger.error("Failed to read directory: {}", path.toString(), e);
             }
           }
         } catch (Exception e) {
