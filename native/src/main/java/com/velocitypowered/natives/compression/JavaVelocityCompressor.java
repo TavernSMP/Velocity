@@ -79,7 +79,7 @@ public class JavaVelocityCompressor implements VelocityCompressor {
   }
 
   @Override
-  public void deflate(ByteBuf source, ByteBuf destination) throws DataFormatException {
+  public void deflate(ByteBuf source, ByteBuf destination) {
     ensureNotDisposed();
 
     // We (probably) can't nicely deal with >=1 buffer nicely, so let's scream loudly.

@@ -157,7 +157,7 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(HeaderAndFooterPacket packet) {
+  default boolean handle(HeaderAndFooterPacket ignoredPacket) {
     return false;
   }
 
@@ -189,7 +189,7 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(RespawnPacket packet) {
+  default boolean handle(RespawnPacket ignoredPacket) {
     return false;
   }
 
@@ -225,27 +225,27 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(LegacyTitlePacket packet) {
+  default boolean handle(LegacyTitlePacket ignoredPacket) {
     return false;
   }
 
-  default boolean handle(TitleTextPacket packet) {
+  default boolean handle(TitleTextPacket ignoredPacket) {
     return false;
   }
 
-  default boolean handle(TitleSubtitlePacket packet) {
+  default boolean handle(TitleSubtitlePacket ignoredPacket) {
     return false;
   }
 
-  default boolean handle(TitleActionbarPacket packet) {
+  default boolean handle(TitleActionbarPacket ignoredPacket) {
     return false;
   }
 
-  default boolean handle(TitleTimesPacket packet) {
+  default boolean handle(TitleTimesPacket ignoredPacket) {
     return false;
   }
 
-  default boolean handle(TitleClearPacket packet) {
+  default boolean handle(TitleClearPacket ignoredPacket) {
     return false;
   }
 
@@ -273,7 +273,7 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(SystemChatPacket packet) {
+  default boolean handle(SystemChatPacket ignoredPacket) {
     return false;
   }
 
@@ -285,7 +285,7 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(PlayerChatCompletionPacket packet) {
+  default boolean handle(PlayerChatCompletionPacket ignoredPacket) {
     return false;
   }
 
@@ -305,7 +305,7 @@ public interface MinecraftSessionHandler {
     return false;
   }
 
-  default boolean handle(ActiveFeaturesPacket packet) {
+  default boolean handle(ActiveFeaturesPacket ignoredPacket) {
     return false;
   }
 

@@ -75,6 +75,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A utility class to make working with the pipeline a little less painful and transparently handles
@@ -111,7 +112,7 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelActive(ChannelHandlerContext ctx) throws Exception {
+  public void channelActive(@NotNull ChannelHandlerContext ctx) {
     if (activeSessionHandler != null) {
       activeSessionHandler.connected();
     }
@@ -122,7 +123,7 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+  public void channelInactive(@NotNull ChannelHandlerContext ctx) {
     if (activeSessionHandler != null) {
       activeSessionHandler.disconnected();
     }
@@ -140,7 +141,7 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+  public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) {
     try {
       if (activeSessionHandler == null) {
         // No session handler available, do nothing
@@ -171,14 +172,14 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+  public void channelReadComplete(ChannelHandlerContext ctx) {
     if (activeSessionHandler != null) {
       activeSessionHandler.readCompleted();
     }
   }
 
   @Override
-  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
     if (ctx.channel().isActive()) {
       if (activeSessionHandler != null) {
         try {
@@ -217,7 +218,7 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
   }
 
   @Override
-  public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+  public void channelWritabilityChanged(ChannelHandlerContext ctx) {
     if (activeSessionHandler != null) {
       activeSessionHandler.writabilityChanged();
     }

@@ -697,7 +697,7 @@ public class ClientPlaySessionHandler implements MinecraftSessionHandler {
               player, command, ex);
           return null;
         });
-    return true; // Sorry, handler; we're just gonna have to lie to you here.
+    return true; // Sorry, handler; we're just going to have to lie to you here.
   }
 
   private boolean handleRegularTabComplete(TabCompleteRequestPacket packet) {

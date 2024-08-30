@@ -27,9 +27,11 @@ import io.netty.resolver.DefaultNameResolver;
 import io.netty.resolver.InetNameResolver;
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -98,9 +100,10 @@ public final class SeparatePoolInetNameResolver extends InetNameResolver {
     }
 
     try {
-      promise.addListener(future -> {
+      promise.addListener((GenericFutureListener<Future<List<InetAddress>>>) future -> {
         if (future.isSuccess()) {
-          cache.put(inetHost, (List<InetAddress>) future.getNow());
+          List<InetAddress> result = future.getNow();
+          cache.put(inetHost, Collections.unmodifiableList(result));
         }
       });
       resolveExecutor.execute(() -> this.delegate.resolveAll(inetHost, promise));
@@ -120,7 +123,7 @@ public final class SeparatePoolInetNameResolver extends InetNameResolver {
    */
   public AddressResolverGroup<InetSocketAddress> asGroup() {
     if (this.resolverGroup == null) {
-      this.resolverGroup = new AddressResolverGroup<InetSocketAddress>() {
+      this.resolverGroup = new AddressResolverGroup<>() {
         @Override
         protected AddressResolver<InetSocketAddress> newResolver(EventExecutor executor) {
           return asAddressResolver();

@@ -89,7 +89,7 @@ public class BungeeCordMessageResponder {
     }
   }
 
-  private void processIp(ByteBufDataInput in) {
+  private void processIp(ByteBufDataInput ignoredIn) {
     ByteBuf buf = Unpooled.buffer();
     try (ByteBufDataOutput out = new ByteBufDataOutput(buf)) {
       out.writeUTF("IP");
