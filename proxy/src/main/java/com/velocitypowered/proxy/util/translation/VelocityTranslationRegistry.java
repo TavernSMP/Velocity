@@ -82,7 +82,7 @@ public final class VelocityTranslationRegistry implements TranslationRegistry {
       resultingComponent = MiniMessage.miniMessage().deserialize(miniMessageString);
     } else {
       resultingComponent = MiniMessage.miniMessage().deserialize(miniMessageString,
-              new ArgumentTag(component.arguments().stream().map(c -> GlobalTranslator.render((Component) c, locale)).toList()));
+              new ArgumentTag(component.args().stream().map(c -> GlobalTranslator.render(c, locale)).toList()));
     }
 
     if (component.children().isEmpty()) {
