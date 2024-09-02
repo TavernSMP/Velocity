@@ -336,6 +336,7 @@ public class ConfigSessionHandler implements MinecraftSessionHandler {
   @Override
   public void disconnected() {
     final ConnectedPlayer player = serverConn.getPlayer();
+    logger.warn("The player {} has been forcibly disconnected due to being stuck in the configuration state.", player.getUsername());
     player.teardown();
   }
 
