@@ -34,7 +34,7 @@ import java.util.Map;
 public final class SimpleCommandInvocation extends AbstractCommandInvocation<String[]>
     implements SimpleCommand.Invocation {
 
-  public static final CommandInvocationFactory<SimpleCommand.Invocation> FACTORY = new Factory();
+  public static final Factory FACTORY = new Factory();
 
   private static class Factory implements CommandInvocationFactory<SimpleCommand.Invocation> {
 

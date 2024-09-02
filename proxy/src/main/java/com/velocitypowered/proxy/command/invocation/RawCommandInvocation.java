@@ -32,7 +32,7 @@ import java.util.Map;
 public final class RawCommandInvocation extends AbstractCommandInvocation<String>
     implements RawCommand.Invocation {
 
-  public static final CommandInvocationFactory<RawCommand.Invocation> FACTORY = new Factory();
+  public static final Factory FACTORY = new Factory();
 
   private static class Factory implements CommandInvocationFactory<RawCommand.Invocation> {
 
