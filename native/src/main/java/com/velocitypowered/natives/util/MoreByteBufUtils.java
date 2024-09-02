@@ -54,11 +54,10 @@ public class MoreByteBufUtils {
     BufferPreference preferred = nativeStuff.preferredBufferType();
     return switch (preferred) {
       case DIRECT_PREFERRED, HEAP_PREFERRED ->
-      // The native prefers this type, but doesn't strictly require we provide it.
-      true;
+        // The native prefers this type, but doesn't strictly require we provide it.
+        true;
       case DIRECT_REQUIRED -> buf.hasMemoryAddress();
       case HEAP_REQUIRED -> buf.hasArray();
-      default -> throw new AssertionError("Preferred buffer type unknown");
     };
   }
 
@@ -76,7 +75,6 @@ public class MoreByteBufUtils {
     return switch (nativeStuff.preferredBufferType()) {
       case HEAP_REQUIRED, HEAP_PREFERRED -> alloc.heapBuffer(initialCapacity);
       case DIRECT_PREFERRED, DIRECT_REQUIRED -> alloc.directBuffer(initialCapacity);
-      default -> throw new AssertionError("Preferred buffer type unknown");
     };
   }
 }
