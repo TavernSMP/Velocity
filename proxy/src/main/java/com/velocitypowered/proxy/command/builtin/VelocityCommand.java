@@ -46,6 +46,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
@@ -95,9 +97,14 @@ public final class VelocityCommand {
         .requires(source -> source.getPermissionValue("velocity.command.reload") == Tristate.TRUE)
         .executes(new Reload(server))
         .build();
+    final LiteralCommandNode<CommandSource> uptime = BrigadierCommand
+        .literalArgumentBuilder("uptime")
+        .requires(source -> source.getPermissionValue("velocity.command.uptime") == Tristate.TRUE)
+        .executes(new Uptime(server))
+        .build();
 
     final List<LiteralCommandNode<CommandSource>> commands = List
-            .of(dump, heap, info, plugins, reload);
+            .of(dump, heap, info, plugins, reload, uptime);
     return new BrigadierCommand(
       commands.stream()
         .reduce(
@@ -120,6 +127,32 @@ public final class VelocityCommand {
           ArgumentBuilder::then
         )
     );
+  }
+
+  private record Uptime(VelocityServer server) implements Command<CommandSource> {
+
+    private static final Instant startTime = Instant.now();
+
+    @Override
+    public int run(final CommandContext<CommandSource> context) {
+      final CommandSource source = context.getSource();
+
+      Duration uptime = Duration.between(startTime, Instant.now());
+
+      long days = uptime.toDays();
+      long hours = uptime.toHoursPart();
+      long minutes = uptime.toMinutesPart();
+      long seconds = uptime.toSecondsPart();
+
+      source.sendMessage(Component.translatable("velocity.command.uptime",
+          NamedTextColor.GREEN,
+          Component.text(days),
+          Component.text(hours),
+          Component.text(minutes),
+          Component.text(seconds)
+      ));
+      return Command.SINGLE_SUCCESS;
+    }
   }
 
   private record Reload(VelocityServer server) implements Command<CommandSource> {
