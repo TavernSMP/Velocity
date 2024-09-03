@@ -45,10 +45,9 @@ public class MinecraftVarintLengthEncoder extends MessageToMessageEncoder<ByteBu
     final int length = buf.readableBytes();
     final int varintLength = ProtocolUtils.varIntBytes(length);
 
-  @Override
-  final ByteBuf lenBuf = IS_JAVA_CIPHER
-      ? ctx.alloc().heapBuffer(varintLength)
-      : ctx.alloc().directBuffer(varintLength);
+    final ByteBuf lenBuf = IS_JAVA_CIPHER
+        ? ctx.alloc().heapBuffer(varintLength)
+        : ctx.alloc().directBuffer(varintLength);
 
     ProtocolUtils.writeVarInt(lenBuf, length);
     list.add(lenBuf);
