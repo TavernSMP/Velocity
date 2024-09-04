@@ -180,20 +180,39 @@ public class VelocityConfiguration implements ProxyConfig {
           + "receive any support!");
     }
 
+    boolean requireForwardingSecret = false;
+    for (Map.Entry<String, PlayerInfoForwarding> entry : servers.getServerForwardingModes().entrySet()) {
+      switch (entry.getValue()) {
+        case NONE:
+          logger.warn("Player info forwarding is disabled for {}!"
+                  + " All players will appear to be connecting from the proxy and will have offline-mode UUIDs.", entry.getKey());
+          break;
+        case MODERN:
+        case BUNGEEGUARD:
+          requireForwardingSecret = true;
+          break;
+        default:
+          break;
+      }
+    }
+
     switch (playerInfoForwardingMode) {
       case NONE:
-        logger.warn("Player info forwarding is disabled! All players will appear to be connecting "
+        logger.warn("Player info forwarding is disabled by default! All players will appear to be connecting "
             + "from the proxy and will have offline-mode UUIDs.");
         break;
       case MODERN:
       case BUNGEEGUARD:
-        if (forwardingSecret == null || forwardingSecret.length == 0) {
-          logger.error("You don't have a forwarding secret set. This is required for security.");
-          valid = false;
-        }
+        requireForwardingSecret = true;
         break;
       default:
         break;
+    }
+
+    if (requireForwardingSecret && (forwardingSecret == null || forwardingSecret.length == 0)) {
+      logger.error("You don't have a forwarding secret set. This is required for security. "
+          + "See https://docs.papermc.io/velocity for more details.");
+      valid = false;
     }
 
     if (servers.getServers().isEmpty()) {
@@ -324,6 +343,10 @@ public class VelocityConfiguration implements ProxyConfig {
 
   public PlayerInfoForwarding getPlayerInfoForwardingMode() {
     return playerInfoForwardingMode;
+  }
+
+  public PlayerInfoForwarding getServerForwardingMode(String server) {
+    return servers.getServerForwardingModes().getOrDefault(server, playerInfoForwardingMode);
   }
 
   public byte[] getForwardingSecret() {
@@ -681,6 +704,7 @@ public class VelocityConfiguration implements ProxyConfig {
         "minigames", "127.0.0.1:30068"
     );
     private List<String> attemptConnectionOrder = ImmutableList.of("lobby");
+    private Map<String, PlayerInfoForwarding> serverForwardingModes = ImmutableMap.of();
 
     private boolean enableDynamicFallbacks = false;
 
@@ -690,9 +714,25 @@ public class VelocityConfiguration implements ProxyConfig {
     private Servers(CommentedConfig config) {
       if (config != null) {
         Map<String, String> servers = new HashMap<>();
+        Map<String, PlayerInfoForwarding> serverForwardingModes = new HashMap<>();
         for (UnmodifiableConfig.Entry entry : config.entrySet()) {
           if (entry.getValue() instanceof String) {
             servers.put(cleanServerName(entry.getKey()), entry.getValue());
+          } else if (entry.getValue() instanceof UnmodifiableConfig) {
+            UnmodifiableConfig unmodifiableConfig = entry.getValue();
+            String name = entry.getKey();
+
+            String address = unmodifiableConfig.get("address");
+            if (address == null) {
+              throw new IllegalArgumentException("Server " + name + " doesn't have an address!");
+            }
+
+            PlayerInfoForwarding mode = unmodifiableConfig.getEnum("forwarding-mode", PlayerInfoForwarding.class);
+            if (mode != null) {
+              serverForwardingModes.put(name, mode);
+            }
+
+            servers.put(name, address);
           } else {
             if (!entry.getKey().equalsIgnoreCase("try") && !entry.getKey().equalsIgnoreCase("enable-dynamic-fallbacks")) {
               throw new IllegalArgumentException(
@@ -706,7 +746,7 @@ public class VelocityConfiguration implements ProxyConfig {
       }
     }
 
-    private Servers(Map<String, String> servers, List<String> attemptConnectionOrder) {
+    private Servers(Map<String, String> servers, List<String> attemptConnectionOrder, Map<String, PlayerInfoForwarding> serverForwardingModes) {
       this.servers = servers;
       this.attemptConnectionOrder = attemptConnectionOrder;
     }
@@ -729,6 +769,15 @@ public class VelocityConfiguration implements ProxyConfig {
 
     public void setAttemptConnectionOrder(List<String> attemptConnectionOrder) {
       this.attemptConnectionOrder = attemptConnectionOrder;
+      this.serverForwardingModes = ImmutableMap.copyOf(serverForwardingModes);
+    }
+
+    public Map<String, PlayerInfoForwarding> getServerForwardingModes() {
+      return serverForwardingModes;
+    }
+
+    public void setServerForwardingModes(Map<String, PlayerInfoForwarding> serverForwardingModes) {
+      this.serverForwardingModes = serverForwardingModes;
     }
 
     /**
@@ -748,6 +797,7 @@ public class VelocityConfiguration implements ProxyConfig {
       return "Servers{"
           + "servers=" + servers
           + ", attemptConnectionOrder=" + attemptConnectionOrder
+          + ", serverForwardingModes=" + serverForwardingModes
           + '}';
     }
   }
