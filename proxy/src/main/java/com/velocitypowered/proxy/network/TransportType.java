@@ -37,11 +37,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.incubator.channel.uring.IOUring;
-import io.netty.incubator.channel.uring.IOUringDatagramChannel;
-import io.netty.incubator.channel.uring.IOUringEventLoopGroup;
-import io.netty.incubator.channel.uring.IOUringServerSocketChannel;
-import io.netty.incubator.channel.uring.IOUringSocketChannel;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.BiFunction;
 
@@ -53,10 +48,6 @@ public enum TransportType {
       NioSocketChannel::new,
       NioDatagramChannel::new,
       (name, type) -> new NioEventLoopGroup(0, createThreadFactory(name, type))),
-  IO_URING("io_uring", IOUringServerSocketChannel::new,
-      IOUringSocketChannel::new,
-      IOUringDatagramChannel::new,
-      (name, type) -> new IOUringEventLoopGroup(0, createThreadFactory(name, type))),
   EPOLL("epoll", EpollServerSocketChannel::new,
       EpollSocketChannel::new,
       EpollDatagramChannel::new,
@@ -105,10 +96,6 @@ public enum TransportType {
   public static TransportType bestType() {
     if (Boolean.getBoolean("velocity.disable-native-transport")) {
       return NIO;
-    }
-
-    if (IOUring.isAvailable()) {
-      return IO_URING;
     }
 
     if (Epoll.isAvailable()) {
