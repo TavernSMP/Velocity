@@ -251,6 +251,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     if (configuration.isHubEnabled()) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
     }
+
     registerTranslations(true);
 
     for (Map.Entry<String, String> entry : configuration.getServers().entrySet()) {
