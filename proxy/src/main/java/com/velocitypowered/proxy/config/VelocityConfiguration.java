@@ -83,6 +83,8 @@ public class VelocityConfiguration implements ProxyConfig {
   private final Servers servers;
   private final ForcedHosts forcedHosts;
   @Expose
+  private final Commands commands;
+  @Expose
   private final Advanced advanced;
   @Expose
   private final Query query;
@@ -110,10 +112,11 @@ public class VelocityConfiguration implements ProxyConfig {
   @Expose
   private String minimumVersion = "1.7.2";
 
-  private VelocityConfiguration(Servers servers, ForcedHosts forcedHosts, Advanced advanced,
-      Query query, Metrics metrics) {
+  private VelocityConfiguration(Servers servers, ForcedHosts forcedHosts, Commands commands,
+      Advanced advanced, Query query, Metrics metrics) {
     this.servers = servers;
     this.forcedHosts = forcedHosts;
+    this.commands = commands;
     this.advanced = advanced;
     this.query = query;
     this.metrics = metrics;
@@ -124,7 +127,7 @@ public class VelocityConfiguration implements ProxyConfig {
       PlayerInfoForwarding playerInfoForwardingMode, byte[] forwardingSecret,
       boolean onlineModeKickExistingPlayers, PingPassthroughMode pingPassthrough,
       boolean enablePlayerAddressLogging, Servers servers, ForcedHosts forcedHosts,
-      Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
+      Commands commands, Advanced advanced, Query query, Metrics metrics, boolean forceKeyAuthentication,
       boolean logPlayerConnections, boolean logPlayerDisconnections,
       boolean logOfflineConnections, boolean disableForge, boolean enforceChatSigning,
       boolean translateHeaderFooter, boolean logMinimumVersion, String minimumVersion) {
@@ -141,6 +144,7 @@ public class VelocityConfiguration implements ProxyConfig {
     this.enablePlayerAddressLogging = enablePlayerAddressLogging;
     this.servers = servers;
     this.forcedHosts = forcedHosts;
+    this.commands = commands;
     this.advanced = advanced;
     this.query = query;
     this.metrics = metrics;
@@ -398,6 +402,30 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.getConnectionTimeout();
   }
 
+  public boolean isAlertEnabled() {
+    return commands.isAlertEnabled();
+  }
+
+  public boolean isAlertRawEnabled() {
+    return commands.isAlertRawEnabled();
+  }
+
+  public boolean isFindEnabled() {
+    return commands.isFindEnabled();
+  }
+
+  public boolean isHubEnabled() {
+    return commands.isHubEnabled();
+  }
+
+  public boolean isPingEnabled() {
+    return commands.isPingEnabled();
+  }
+
+  public boolean isShowAllEnabled() {
+    return commands.isShowAllEnabled();
+  }
+
   @Override
   public int getReadTimeout() {
     return advanced.getReadTimeout();
@@ -487,6 +515,7 @@ public class VelocityConfiguration implements ProxyConfig {
         .add("announceForge", announceForge)
         .add("servers", servers)
         .add("forcedHosts", forcedHosts)
+        .add("commands", commands)
         .add("advanced", advanced)
         .add("query", query)
         .add("favicon", favicon)
@@ -573,6 +602,7 @@ public class VelocityConfiguration implements ProxyConfig {
       // Read the rest of the config
       final CommentedConfig serversConfig = config.get("servers");
       final CommentedConfig forcedHostsConfig = config.get("forced-hosts");
+      final CommentedConfig commandsConfig = config.get("commands");
       final CommentedConfig advancedConfig = config.get("advanced");
       final CommentedConfig queryConfig = config.get("query");
       final CommentedConfig metricsConfig = config.get("metrics");
@@ -628,6 +658,7 @@ public class VelocityConfiguration implements ProxyConfig {
               enablePlayerAddressLogging,
               new Servers(serversConfig),
               new ForcedHosts(forcedHostsConfig),
+              new Commands(commandsConfig),
               new Advanced(advancedConfig),
               new Query(queryConfig),
               new Metrics(metricsConfig),
@@ -848,6 +879,71 @@ public class VelocityConfiguration implements ProxyConfig {
     public String toString() {
       return "ForcedHosts{"
           + "forcedHosts=" + forcedHosts
+          + '}';
+    }
+  }
+
+  private static class Commands {
+    @Expose
+    private boolean alertCommand = true;
+    @Expose
+    private boolean alertRawCommand = true;
+    @Expose
+    private boolean findCommand = true;
+    @Expose
+    private boolean hubCommand = true;
+    @Expose
+    private boolean pingCommand = true;
+    @Expose
+    private boolean showAllCommand = true;
+
+    private Commands() {
+    }
+
+    private Commands(CommentedConfig config) {
+      if (config != null) {
+        this.alertCommand = config.getOrElse("alert-enabled", true);
+        this.alertRawCommand = config.getOrElse("alertraw-enabled", true);
+        this.findCommand = config.getOrElse("find-enabled", true);
+        this.hubCommand = config.getOrElse("hub-enabled", true);
+        this.pingCommand = config.getOrElse("ping-enabled", true);
+        this.showAllCommand = config.getOrElse("showall-enabled", true);
+      }
+    }
+
+    public boolean isAlertEnabled() {
+      return alertCommand;
+    }
+
+    public boolean isAlertRawEnabled() {
+      return alertRawCommand;
+    }
+
+    public boolean isFindEnabled() {
+      return findCommand;
+    }
+
+    public boolean isHubEnabled() {
+      return hubCommand;
+    }
+
+    public boolean isPingEnabled() {
+      return pingCommand;
+    }
+
+    public boolean isShowAllEnabled() {
+      return showAllCommand;
+    }
+
+    @Override
+    public String toString() {
+      return "Commands{"
+          + "alertCommand=" + alertCommand
+          + ", alertRawCommand=" + alertRawCommand
+          + ", findCommand=" + findCommand
+          + ", hubCommand=" + hubCommand
+          + ", pingCommand=" + pingCommand
+          + ", showAllCommand=" + showAllCommand
           + '}';
     }
   }

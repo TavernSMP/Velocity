@@ -233,23 +233,24 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
     cm.logChannelInformation();
 
+    this.doStartupConfigLoad();
+
     // Initialize commands first
     commandManager.register(VelocityCommand.create(this));
     commandManager.register(CallbackCommand.create());
     commandManager.register(ServerCommand.create(this));
     commandManager.register("shutdown", ShutdownCommand.command(this),
         "end", "stop");
-    new AlertCommand(this).register();
-    new AlertRawCommand(this).register();
-    new FindCommand(this).register();
+    new AlertCommand(this).register(configuration.isAlertEnabled());
+    new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
+    new FindCommand(this).register(configuration.isFindEnabled());
     new GlistCommand(this).register();
-    new PingCommand(this).register();
+    new PingCommand(this).register(configuration.isPingEnabled());
     new SendCommand(this).register();
-    new ShowAllCommand(this).register();
-    commandManager.register("hub", new HubCommand(this).register(), "lobby");
-
-    this.doStartupConfigLoad();
-
+    new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+    if (configuration.isHubEnabled()) {
+      commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
+    }
     registerTranslations(true);
 
     for (Map.Entry<String, String> entry : configuration.getServers().entrySet()) {
@@ -468,6 +469,12 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
       return false;
     }
 
+    unregisterCommands();
+
+    this.configuration = newConfiguration;
+
+    registerCommands();
+
     unregisterTranslations();
 
     registerTranslations(false);
@@ -544,6 +551,28 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     this.configuration = newConfiguration;
     eventManager.fireAndForget(new ProxyReloadEvent());
     return true;
+  }
+
+  private void unregisterCommands() {
+    commandManager.unregister("alert");
+    commandManager.unregister("alertraw");
+    commandManager.unregister("find");
+    commandManager.unregister("ping");
+    commandManager.unregister("showall");
+    commandManager.unregister("hub");
+    commandManager.unregister("lobby");
+  }
+
+  private void registerCommands() {
+    new AlertCommand(this).register(configuration.isAlertEnabled());
+    new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
+    new FindCommand(this).register(configuration.isFindEnabled());
+    new PingCommand(this).register(configuration.isPingEnabled());
+    new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+
+    if (configuration.isHubEnabled()) {
+      commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
+    }
   }
 
   /**

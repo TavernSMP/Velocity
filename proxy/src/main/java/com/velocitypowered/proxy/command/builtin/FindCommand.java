@@ -45,9 +45,13 @@ public class FindCommand {
   }
 
   /**
-   * Registers the command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isFindEnabled) {
+    if (!isFindEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("find")
         .requires(source ->

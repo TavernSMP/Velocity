@@ -42,9 +42,13 @@ public class PingCommand {
   }
 
   /**
-   * Registers this command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isPingEnabled) {
+    if (!isPingEnabled) {
+      return;
+    }
+
     LiteralArgumentBuilder<CommandSource> node = BrigadierCommand.literalArgumentBuilder("ping")
         .requires(source -> source.getPermissionValue("velocity.command.ping") == Tristate.TRUE)
         .then(

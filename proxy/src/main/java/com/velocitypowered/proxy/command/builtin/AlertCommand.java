@@ -41,9 +41,13 @@ public class AlertCommand {
   }
 
   /**
-   * Registers the command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isAlertEnabled) {
+    if (!isAlertEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("alert")
         .requires(source ->

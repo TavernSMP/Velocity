@@ -41,9 +41,13 @@ public class AlertRawCommand {
   }
 
   /**
-   * Registers the command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isAlertRawEnabled) {
+    if (!isAlertRawEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("alertraw")
         .requires(source ->

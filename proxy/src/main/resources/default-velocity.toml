@@ -97,6 +97,17 @@ log-player-connections = true
 # player connections and initial connections.
 log-player-disconnections = true
 
+[commands]
+# Users often prefer to outright unregister the command instead of setting
+# the command to false for users, as console overrides that priviledge.
+# This does not allow you to deactivate commands from stock Velocity.
+alert-enabled = true
+alert-raw-enabled = true
+find-enabled = true
+hub-enabled = true
+ping-enabled = true
+showall-enabled = true
+
 [servers]
 # Configure your servers here. Each key represents the server's name, and the value
 # represents the IP address of the server to connect to.

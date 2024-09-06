@@ -45,9 +45,13 @@ public class ShowAllCommand {
   }
 
   /**
-   * Register the command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isShowAllEnabled) {
+    if (!isShowAllEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("showall")
         .requires(source ->

@@ -45,14 +45,18 @@ public class HubCommand {
   }
 
   /**
-   * Registers the command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public BrigadierCommand register() {
+  public BrigadierCommand register(boolean isHubCommand) {
+    if (!isHubCommand) {
+      return null;
+    }
+
     return new BrigadierCommand(BrigadierCommand
-            .literalArgumentBuilder("hub")
-            .requires(source ->
-                    source.getPermissionValue("velocity.command.hub") == Tristate.TRUE)
-            .executes(this::lobby).build());
+        .literalArgumentBuilder("hub")
+        .requires(source ->
+          source.getPermissionValue("velocity.command.hub") == Tristate.TRUE)
+        .executes(this::lobby).build());
   }
 
   private int lobby(final CommandContext<CommandSource> context) {
