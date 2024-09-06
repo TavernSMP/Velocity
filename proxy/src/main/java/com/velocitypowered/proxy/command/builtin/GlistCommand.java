@@ -51,9 +51,13 @@ public class GlistCommand {
   }
 
   /**
-   * Registers this command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isGlistEnabled) {
+    if (!isGlistEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("glist")
         .requires(source ->

@@ -402,6 +402,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return advanced.getConnectionTimeout();
   }
 
+  public boolean isServerEnabled() {
+    return commands.isServerEnabled();
+  }
+
   public boolean isAlertEnabled() {
     return commands.isAlertEnabled();
   }
@@ -414,12 +418,20 @@ public class VelocityConfiguration implements ProxyConfig {
     return commands.isFindEnabled();
   }
 
+  public boolean isGlistEnabled() {
+    return commands.isGlistEnabled();
+  }
+
   public boolean isHubEnabled() {
     return commands.isHubEnabled();
   }
 
   public boolean isPingEnabled() {
     return commands.isPingEnabled();
+  }
+
+  public boolean isSendEnabled() {
+    return commands.isSendEnabled();
   }
 
   public boolean isShowAllEnabled() {
@@ -885,15 +897,21 @@ public class VelocityConfiguration implements ProxyConfig {
 
   private static class Commands {
     @Expose
+    private boolean serverCommand = true;
+    @Expose
     private boolean alertCommand = true;
     @Expose
     private boolean alertRawCommand = true;
     @Expose
     private boolean findCommand = true;
     @Expose
+    private boolean glistCommand = true;
+    @Expose
     private boolean hubCommand = true;
     @Expose
     private boolean pingCommand = true;
+    @Expose
+    private boolean sendCommand = true;
     @Expose
     private boolean showAllCommand = true;
 
@@ -902,13 +920,20 @@ public class VelocityConfiguration implements ProxyConfig {
 
     private Commands(CommentedConfig config) {
       if (config != null) {
+        this.serverCommand = config.getOrElse("server-enabled", true);
         this.alertCommand = config.getOrElse("alert-enabled", true);
         this.alertRawCommand = config.getOrElse("alertraw-enabled", true);
         this.findCommand = config.getOrElse("find-enabled", true);
+        this.glistCommand = config.getOrElse("glist-enabled", true);
         this.hubCommand = config.getOrElse("hub-enabled", true);
         this.pingCommand = config.getOrElse("ping-enabled", true);
+        this.sendCommand = config.getOrElse("send-enabled", true);
         this.showAllCommand = config.getOrElse("showall-enabled", true);
       }
+    }
+
+    public boolean isServerEnabled() {
+      return serverCommand;
     }
 
     public boolean isAlertEnabled() {
@@ -923,12 +948,20 @@ public class VelocityConfiguration implements ProxyConfig {
       return findCommand;
     }
 
+    public boolean isGlistEnabled() {
+      return glistCommand;
+    }
+
     public boolean isHubEnabled() {
       return hubCommand;
     }
 
     public boolean isPingEnabled() {
       return pingCommand;
+    }
+
+    public boolean isSendEnabled() {
+      return sendCommand;
     }
 
     public boolean isShowAllEnabled() {
@@ -938,11 +971,14 @@ public class VelocityConfiguration implements ProxyConfig {
     @Override
     public String toString() {
       return "Commands{"
-          + "alertCommand=" + alertCommand
+          + "serverCommand=" + serverCommand
+          + ", alertCommand=" + alertCommand
           + ", alertRawCommand=" + alertRawCommand
           + ", findCommand=" + findCommand
+          + ", glistCommand=" + glistCommand
           + ", hubCommand=" + hubCommand
           + ", pingCommand=" + pingCommand
+          + ", sendCommand=" + sendCommand
           + ", showAllCommand=" + showAllCommand
           + '}';
     }

@@ -238,15 +238,15 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     // Initialize commands first
     commandManager.register(VelocityCommand.create(this));
     commandManager.register(CallbackCommand.create());
-    commandManager.register(ServerCommand.create(this));
+    commandManager.register(ServerCommand.create(this, configuration.isServerEnabled()));
     commandManager.register("shutdown", ShutdownCommand.command(this),
         "end", "stop");
     new AlertCommand(this).register(configuration.isAlertEnabled());
     new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
     new FindCommand(this).register(configuration.isFindEnabled());
-    new GlistCommand(this).register();
+    new GlistCommand(this).register(configuration.isGlistEnabled());
     new PingCommand(this).register(configuration.isPingEnabled());
-    new SendCommand(this).register();
+    new SendCommand(this).register(configuration.isSendEnabled());
     new ShowAllCommand(this).register(configuration.isShowAllEnabled());
     if (configuration.isHubEnabled()) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
@@ -555,20 +555,26 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   private void unregisterCommands() {
+    commandManager.unregister("server");
     commandManager.unregister("alert");
     commandManager.unregister("alertraw");
     commandManager.unregister("find");
+    commandManager.unregister("glist");
     commandManager.unregister("ping");
+    commandManager.unregister("send");
     commandManager.unregister("showall");
     commandManager.unregister("hub");
     commandManager.unregister("lobby");
   }
 
   private void registerCommands() {
+    commandManager.register(ServerCommand.create(this, configuration.isServerEnabled()));
     new AlertCommand(this).register(configuration.isAlertEnabled());
     new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
     new FindCommand(this).register(configuration.isFindEnabled());
+    new GlistCommand(this).register(configuration.isGlistEnabled());
     new PingCommand(this).register(configuration.isPingEnabled());
+    new SendCommand(this).register(configuration.isSendEnabled());
     new ShowAllCommand(this).register(configuration.isShowAllEnabled());
 
     if (configuration.isHubEnabled()) {

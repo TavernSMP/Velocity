@@ -49,9 +49,13 @@ public class SendCommand {
   }
 
   /**
-   * Registers this command.
+   * Registers or unregisters the command based on the configuration value.
    */
-  public void register() {
+  public void register(boolean isSendEnabled) {
+    if (!isSendEnabled) {
+      return;
+    }
+
     final LiteralArgumentBuilder<CommandSource> rootNode = BrigadierCommand
         .literalArgumentBuilder("send")
         .requires(source ->

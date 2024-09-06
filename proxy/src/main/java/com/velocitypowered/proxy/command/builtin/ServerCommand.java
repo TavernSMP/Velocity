@@ -45,8 +45,14 @@ public final class ServerCommand {
   private static final String SERVER_ARG = "server";
   public static final int MAX_SERVERS_TO_LIST = 50;
 
-  @SuppressWarnings("checkstyle:MissingJavadocMethod")
-  public static BrigadierCommand create(final ProxyServer server) {
+  /**
+   * Registers or unregisters the command based on the configuration value.
+   */
+  public static BrigadierCommand create(final ProxyServer server, boolean isServerEnabled) {
+    if (!isServerEnabled) {
+      return null;
+    }
+
     final LiteralCommandNode<CommandSource> node = BrigadierCommand
         .literalArgumentBuilder("server")
         .requires(src -> src instanceof Player

@@ -99,8 +99,17 @@ log-player-disconnections = true
 
 [commands]
 # Users often prefer to outright unregister the command instead of setting
-# the command to false for users, as console overrides that priviledge.
-# This does not allow you to deactivate commands from stock Velocity.
+# the command's permission to false for users, as console overrides that priviledge.
+# We particularly exclude raw /velocity {ALL}, callback, and shutdown
+# to maintain functionality or because (for example) "/velocity uptime" does not
+# overlap with any other known commands in Velocity and should never be of concern.
+
+# Velocity Command Registration
+glist-enabled = true
+send-enabled = true
+server-enabled = true
+
+# Velocity-CTD Command Registration
 alert-enabled = true
 alert-raw-enabled = true
 find-enabled = true
