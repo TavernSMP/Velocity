@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.velocitypowered.api.command.BrigadierCommand;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -238,7 +239,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     // Initialize commands first
     commandManager.register(VelocityCommand.create(this));
     commandManager.register(CallbackCommand.create());
-    commandManager.register(ServerCommand.create(this, configuration.isServerEnabled()));
     commandManager.register("shutdown", ShutdownCommand.command(this),
         "end", "stop");
     new AlertCommand(this).register(configuration.isAlertEnabled());
@@ -248,6 +248,12 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     new PingCommand(this).register(configuration.isPingEnabled());
     new SendCommand(this).register(configuration.isSendEnabled());
     new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+
+    final BrigadierCommand serverCommand = ServerCommand.create(this, configuration.isServerEnabled());
+    if (serverCommand != null) {
+      commandManager.register(serverCommand);
+    }
+
     if (configuration.isHubEnabled()) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
     }
@@ -568,7 +574,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   private void registerCommands() {
-    commandManager.register(ServerCommand.create(this, configuration.isServerEnabled()));
     new AlertCommand(this).register(configuration.isAlertEnabled());
     new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
     new FindCommand(this).register(configuration.isFindEnabled());
@@ -576,6 +581,11 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     new PingCommand(this).register(configuration.isPingEnabled());
     new SendCommand(this).register(configuration.isSendEnabled());
     new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+
+    final BrigadierCommand serverCommand = ServerCommand.create(this, configuration.isServerEnabled());
+    if (serverCommand != null) {
+      commandManager.register(serverCommand);
+    }
 
     if (configuration.isHubEnabled()) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
