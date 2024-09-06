@@ -105,9 +105,9 @@ log-player-disconnections = true
 # overlap with any other known commands in Velocity and should never be of concern.
 
 # Velocity Command Registration
+server-enabled = true
 glist-enabled = true
 send-enabled = true
-server-enabled = true
 
 # Velocity-CTD Command Registration
 alert-enabled = true
