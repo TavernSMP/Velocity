@@ -111,7 +111,7 @@ send-enabled = true
 
 # Velocity-CTD Command Registration
 alert-enabled = true
-alert-raw-enabled = true
+alertraw-enabled = true
 find-enabled = true
 hub-enabled = true
 ping-enabled = true
