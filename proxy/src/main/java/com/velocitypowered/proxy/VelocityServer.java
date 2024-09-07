@@ -88,6 +88,7 @@ import java.security.KeyPair;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -486,7 +487,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
     registerTranslations(false);
 
-    ServerCommand.reloadServerList(this);
+    reloadServerList();
 
     // Re-register servers. If a server is being replaced, make sure to note what players need to
     // move back to a fallback server.
@@ -592,6 +593,44 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     if (configuration.isHubEnabled()) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
     }
+  }
+
+  /**
+   * Reloads the list of servers based on the updated configuration.
+   * <p>
+   * This is exclusively implemented within VelocityServer as it
+   * is not a function necessary and present for generic purposes
+   * within ServerCommand and is exclusive to reload's functionality.
+   * </p>
+   */
+  public void reloadServerList() {
+    VelocityConfiguration config = getConfiguration();
+    List<ServerInfo> newConfigServers = loadServersFromNewList(config);
+
+    getAllServers().forEach(server -> {
+      if (!newConfigServers.contains(server.getServerInfo())) {
+        unregisterServer(server.getServerInfo());
+      }
+    });
+
+    newConfigServers.forEach(serverInfo -> {
+      if (getServer(serverInfo.getName()).isEmpty()) {
+        registerServer(serverInfo);
+      }
+    });
+  }
+
+  /**
+   * Loads the server list from the velocity configuration file.
+   */
+  private static List<ServerInfo> loadServersFromNewList(VelocityConfiguration config) {
+    List<ServerInfo> serverList = new ArrayList<>();
+
+    config.getServers().forEach((serverName, address) -> {
+      InetSocketAddress socketAddress = AddressUtil.parseAddress(address);
+      serverList.add(new ServerInfo(serverName, socketAddress));
+    });
+    return serverList;
   }
 
   /**
