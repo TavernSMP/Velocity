@@ -486,6 +486,8 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
     registerTranslations(false);
 
+    ServerCommand.reloadServerList(this);
+
     // Re-register servers. If a server is being replaced, make sure to note what players need to
     // move back to a fallback server.
     Collection<ConnectedPlayer> evacuate = new ArrayList<>();

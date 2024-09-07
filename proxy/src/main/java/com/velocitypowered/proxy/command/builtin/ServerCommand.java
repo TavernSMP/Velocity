@@ -30,6 +30,11 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
+import com.velocitypowered.proxy.VelocityServer;
+import com.velocitypowered.proxy.config.VelocityConfiguration;
+import com.velocitypowered.proxy.util.AddressUtil;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
@@ -115,8 +120,40 @@ public final class ServerCommand {
     return new BrigadierCommand(node);
   }
 
-  private static void outputServerInformation(final Player executor,
-                                              final ProxyServer server) {
+  /**
+   * Reloads the server list after configuration reload.
+   */
+  public static void reloadServerList(VelocityServer proxy) {
+    VelocityConfiguration config = proxy.getConfiguration();
+    List<ServerInfo> newConfigServers = loadServersFromNewList(config);
+
+    proxy.getAllServers().forEach(server -> {
+      if (!newConfigServers.contains(server.getServerInfo())) {
+        proxy.unregisterServer(server.getServerInfo());
+      }
+    });
+
+    newConfigServers.forEach(serverInfo -> {
+      if (proxy.getServer(serverInfo.getName()).isEmpty()) {
+        proxy.registerServer(serverInfo);
+      }
+    });
+  }
+
+  /**
+   * Loads the server list from the velocity.toml configuration file.
+   */
+  private static List<ServerInfo> loadServersFromNewList(VelocityConfiguration config) {
+    List<ServerInfo> serverList = new ArrayList<>();
+
+    config.getServers().forEach((serverName, address) -> {
+      InetSocketAddress socketAddress = AddressUtil.parseAddress(address);
+      serverList.add(new ServerInfo(serverName, socketAddress));
+    });
+    return serverList;
+  }
+
+  private static void outputServerInformation(final Player executor, final ProxyServer server) {
     final String currentServer = executor.getCurrentServer()
         .map(ServerConnection::getServerInfo)
         .map(ServerInfo::getName)

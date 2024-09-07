@@ -54,6 +54,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ParameterizedMessageFactory;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
@@ -61,7 +62,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  */
 public class AuthSessionHandler implements MinecraftSessionHandler {
 
-  private static final Logger logger = LogManager.getLogger(AuthSessionHandler.class);
+  private static final Logger logger = LogManager.getLogger(AuthSessionHandler.class, new ParameterizedMessageFactory());
   private static final ComponentLogger componentLogger = ComponentLogger.logger(AuthSessionHandler.class);
 
   private final VelocityServer server;
