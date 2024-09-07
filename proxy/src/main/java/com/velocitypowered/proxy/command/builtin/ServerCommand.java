@@ -153,7 +153,8 @@ public final class ServerCommand {
     return serverList;
   }
 
-  private static void outputServerInformation(final Player executor, final ProxyServer server) {
+  private static void outputServerInformation(final Player executor,
+                                              final ProxyServer server) {
     final String currentServer = executor.getCurrentServer()
         .map(ServerConnection::getServerInfo)
         .map(ServerInfo::getName)
