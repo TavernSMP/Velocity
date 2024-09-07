@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
+import org.apache.logging.log4j.message.ReusableMessageFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jline.reader.Candidate;
@@ -53,7 +54,7 @@ import org.jline.reader.LineReaderBuilder;
  */
 public final class VelocityConsole extends SimpleTerminalConsole implements ConsoleCommandSource {
 
-  private static final Logger logger = LogManager.getLogger(VelocityConsole.class);
+  private static final Logger logger = LogManager.getLogger(VelocityConsole.class, new ReusableMessageFactory());
   private static final ComponentLogger componentLogger = ComponentLogger
           .logger(VelocityConsole.class);
 
