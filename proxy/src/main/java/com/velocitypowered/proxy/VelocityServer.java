@@ -242,22 +242,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     commandManager.register(CallbackCommand.create());
     commandManager.register("shutdown", ShutdownCommand.command(this),
         "end", "stop");
-    new AlertCommand(this).register(configuration.isAlertEnabled());
-    new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
-    new FindCommand(this).register(configuration.isFindEnabled());
-    new GlistCommand(this).register(configuration.isGlistEnabled());
-    new PingCommand(this).register(configuration.isPingEnabled());
-    new SendCommand(this).register(configuration.isSendEnabled());
-    new ShowAllCommand(this).register(configuration.isShowAllEnabled());
-
-    final BrigadierCommand serverCommand = ServerCommand.create(this, configuration.isServerEnabled());
-    if (serverCommand != null) {
-      commandManager.register(serverCommand);
-    }
-
-    if (configuration.isHubEnabled()) {
-      commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
-    }
+    registerCommands();
 
     registerTranslations(true);
 
@@ -564,33 +549,61 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   }
 
   private void unregisterCommands() {
-    commandManager.unregister("server");
-    commandManager.unregister("alert");
-    commandManager.unregister("alertraw");
-    commandManager.unregister("find");
-    commandManager.unregister("glist");
-    commandManager.unregister("ping");
-    commandManager.unregister("send");
-    commandManager.unregister("showall");
-    commandManager.unregister("hub");
-    commandManager.unregister("lobby");
+    unregisterCommand("server");
+    unregisterCommand("alert");
+    unregisterCommand("alertraw");
+    unregisterCommand("find");
+    unregisterCommand("glist");
+    unregisterCommand("ping");
+    unregisterCommand("send");
+    unregisterCommand("showall");
+    unregisterCommand("hub");
+    unregisterCommand("lobby");
+  }
+
+  private void unregisterCommand(String command) {
+    if (commandManager.getCommandMeta(command) != null
+        && Objects.requireNonNull(commandManager.getCommandMeta(command)).getPlugin() instanceof VelocityCommandManager) {
+      commandManager.unregister(command);
+    }
   }
 
   private void registerCommands() {
-    new AlertCommand(this).register(configuration.isAlertEnabled());
-    new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
-    new FindCommand(this).register(configuration.isFindEnabled());
-    new GlistCommand(this).register(configuration.isGlistEnabled());
-    new PingCommand(this).register(configuration.isPingEnabled());
-    new SendCommand(this).register(configuration.isSendEnabled());
-    new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+
+    if (!commandManager.hasCommand("alert")) {
+      new AlertCommand(this).register(configuration.isAlertEnabled());
+    }
+
+    if (!commandManager.hasCommand("alertraw")) {
+      new AlertRawCommand(this).register(configuration.isAlertRawEnabled());
+    }
+
+    if (!commandManager.hasCommand("find")) {
+      new FindCommand(this).register(configuration.isFindEnabled());
+    }
+
+    if (!commandManager.hasCommand("glist")) {
+      new GlistCommand(this).register(configuration.isGlistEnabled());
+    }
+
+    if (!commandManager.hasCommand("ping")) {
+      new PingCommand(this).register(configuration.isPingEnabled());
+    }
+
+    if (!commandManager.hasCommand("send")) {
+      new SendCommand(this).register(configuration.isSendEnabled());
+    }
+
+    if (!commandManager.hasCommand("showall")) {
+      new ShowAllCommand(this).register(configuration.isShowAllEnabled());
+    }
 
     final BrigadierCommand serverCommand = ServerCommand.create(this, configuration.isServerEnabled());
-    if (serverCommand != null) {
+    if (serverCommand != null && !commandManager.hasCommand("server")) {
       commandManager.register(serverCommand);
     }
 
-    if (configuration.isHubEnabled()) {
+    if (configuration.isHubEnabled() && !commandManager.hasCommand("hub")) {
       commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
     }
   }
