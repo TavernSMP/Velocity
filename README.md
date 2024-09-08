@@ -68,7 +68,6 @@ Velocity-CTD is licensed under the GPLv3 license.
 * `velocity.command.alert` [/alert]
 * `velocity.command.alertraw` [/alertraw]
 * `velocity.command.find` [/find]
-* `velocity.command.alert` [/alert]
 * `velocity.command.hub` [/hub & /lobby]
 * `velocity.command.ping` [/ping]
 * `velocity.command.showall` [/showall]
