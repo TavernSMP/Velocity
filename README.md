@@ -22,6 +22,10 @@ Velocity-CTD is licensed under the GPLv3 license.
 
 ## Additional Features/Removals
 
+* Utilization of newer dependencies for virtually any dependency that can
+  easily and fairly be upgraded, to maintain the highest level of performance.
+* Implementation of non-invasive multi-forwarding system that allows you
+  to use a different forwarding method for specific servers on the backend.
 * Configurable `/alert` command sends messages across your entire network.
 * Configurable `/alertraw` command to send non-prefixed messages across your
   entire network.
@@ -32,8 +36,12 @@ Velocity-CTD is licensed under the GPLv3 license.
 * The `/send` supports sending users from `{SERVER_FROM}` to `{SERVER_TO}`.
 * Configurable `/showall` command that displays all users connected to a specific
   instance rather than flooding your chat with users connected everywhere.
+* Configurable `/velocity uptime` command to view how long your proxy has been online for.
 * Implementation of configurable `/server {SERVER}` access for tab completion and
   command execution.
+* Choice implementation that allows you to fully strip, reload, and remove commands
+  present in regular Velocity and require/force deactivation of commands for
+  plugin overrides.
 * Configurable value to disable translation for header and footer for Velocity to
   improve performance in plugins like TAB that do not need it.
 * Configurable minimum version value that allows users to block users on versions
@@ -48,10 +56,23 @@ Velocity-CTD is licensed under the GPLv3 license.
 * Other miscellaneous optimizations and tweaks that will only continue to be
   implemented as this fork matures.
 * Preliminary MiniMessage support to permit full configurability of all Velocity
-  messages, alongside `/velocity reload`able translations.
+  messages, alongside `/velocity reload`able translations, alongside `/velocity reload`able
+  server additions/removals inside the `velocity.toml`.
 * Removal of all language files except `messages.properties` to preserve
   maintainability. PRs are welcome to reimplement all language files
   with our changes.
+* Fix for users with poor connections getting stuck in the configuration phase by
+  immediately removing them upon disconnection, using player teardown. (Issue: [#1251](https://github.com/PaperMC/Velocity/issues/1251))
+
+## Velocity-CTD Permissions
+* `velocity.command.alert` [/alert]
+* `velocity.command.alertraw` [/alertraw]
+* `velocity.command.find` [/find]
+* `velocity.command.alert` [/alert]
+* `velocity.command.hub` [/hub & /lobby]
+* `velocity.command.ping` [/ping]
+* `velocity.command.showall` [/showall]
+* `velocity.command.uptime` [/velocity uptime]
 
 ## Building
 

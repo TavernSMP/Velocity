@@ -29,8 +29,7 @@ public sealed interface ConfigurationMigration
                 KeyAuthenticationMigration,
                 MiniMessageTranslationsMigration,
                 MotdMigration,
-                TransferIntegrationMigration,
-                VelocityCustomFeatureMigration {
+                TransferIntegrationMigration {
   boolean shouldMigrate(CommentedFileConfig config);
 
   void migrate(CommentedFileConfig config, Logger logger) throws IOException;
