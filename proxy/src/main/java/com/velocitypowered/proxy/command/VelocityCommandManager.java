@@ -119,7 +119,7 @@ public class VelocityCommandManager implements CommandManager {
   @Override
   public void register(final BrigadierCommand command) {
     Preconditions.checkNotNull(command, "command");
-    register(metaBuilder(command).plugin(this).build(), command);
+    register(metaBuilder(command).build(), command);
   }
 
   @Override

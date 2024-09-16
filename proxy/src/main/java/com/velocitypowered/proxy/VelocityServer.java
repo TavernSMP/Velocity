@@ -28,6 +28,7 @@ import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
+import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -59,6 +60,9 @@ import com.velocitypowered.proxy.crypto.EncryptionUtils;
 import com.velocitypowered.proxy.event.VelocityEventManager;
 import com.velocitypowered.proxy.network.ConnectionManager;
 import com.velocitypowered.proxy.plugin.VelocityPluginManager;
+import com.velocitypowered.proxy.plugin.loader.VelocityPluginContainer;
+import com.velocitypowered.proxy.plugin.loader.VelocityPluginDescription;
+import com.velocitypowered.proxy.plugin.virtual.VelocityVirtualPlugin;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import com.velocitypowered.proxy.protocol.util.FaviconSerializer;
 import com.velocitypowered.proxy.protocol.util.GameProfileSerializer;
@@ -88,6 +92,7 @@ import java.security.KeyPair;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -126,6 +131,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Implementation of {@link ProxyServer}.
  */
 public class VelocityServer implements ProxyServer, ForwardingAudience {
+
+  public static final String VELOCITY_URL = "https://github.com/GemstoneGG/Velocity-CTD";
 
   private static final Logger logger = LogManager.getLogger(VelocityServer.class);
   public static final Gson GENERAL_GSON = new GsonBuilder()
@@ -180,7 +187,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   VelocityServer(final ProxyOptions options) {
     pluginManager = new VelocityPluginManager(this);
     eventManager = new VelocityEventManager(pluginManager);
-    commandManager = new VelocityCommandManager(eventManager);
+    commandManager = new VelocityCommandManager(eventManager, pluginManager);
     scheduler = new VelocityScheduler(pluginManager);
     console = new VelocityConsole(this);
     cm = new ConnectionManager(this);
@@ -217,6 +224,16 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     return new ProxyVersion(implName, implVendor, implVersion);
   }
 
+  private VelocityPluginContainer createVirtualPlugin() {
+    ProxyVersion version = getVersion();
+    PluginDescription description = new VelocityPluginDescription(
+            "velocity", version.getName(), version.getVersion(), "The Velocity proxy",
+            VELOCITY_URL, ImmutableList.of(version.getVendor()), Collections.emptyList(), null);
+    VelocityPluginContainer container = new VelocityPluginContainer(description);
+    container.setInstance(VelocityVirtualPlugin.INSTANCE);
+    return container;
+  }
+
   @Override
   public VelocityCommandManager getCommandManager() {
     return commandManager;
@@ -231,6 +248,7 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   void start() {
     logger.info("Booting up {} {}...", getVersion().getName(), getVersion().getVersion());
     console.setupStreams();
+    pluginManager.registerPlugin(this.createVirtualPlugin());
 
     serverKeyPair = EncryptionUtils.createRsaKeyPair(1024);
 
@@ -239,10 +257,28 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     this.doStartupConfigLoad();
 
     // Initialize commands first
-    commandManager.register(VelocityCommand.create(this));
-    commandManager.register(CallbackCommand.create());
-    commandManager.register("shutdown", ShutdownCommand.command(this),
-        "end", "stop");
+    final BrigadierCommand velocityParentCommand = VelocityCommand.create(this);
+    commandManager.register(
+        commandManager.metaBuilder(velocityParentCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .build(),
+        velocityParentCommand
+    );
+    final BrigadierCommand callbackCommand = CallbackCommand.create();
+    commandManager.register(
+        commandManager.metaBuilder(callbackCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .build(),
+        velocityParentCommand
+    );
+    final BrigadierCommand shutdownCommand = ShutdownCommand.command(this);
+    commandManager.register(
+        commandManager.metaBuilder(shutdownCommand)
+            .plugin(VelocityVirtualPlugin.INSTANCE)
+            .aliases("end", "stop")
+            .build(),
+        shutdownCommand
+    );
     registerCommands();
 
     registerTranslations(true);
@@ -607,7 +643,12 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
     final BrigadierCommand serverCommand = ServerCommand.create(this, configuration.isServerEnabled());
     if (serverCommand != null && !commandManager.hasCommand("server")) {
-      commandManager.register(serverCommand);
+      commandManager.register(
+          commandManager.metaBuilder(serverCommand)
+              .plugin(VelocityVirtualPlugin.INSTANCE)
+              .build(),
+          serverCommand
+      );
     }
 
     if (configuration.isHubEnabled() && !commandManager.hasCommand("hub")) {
@@ -701,7 +742,6 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
 
         eventManager.fire(new ProxyShutdownEvent()).join();
 
-        timedOut = !eventManager.shutdown() || timedOut;
         timedOut = !scheduler.shutdown() || timedOut;
 
         if (timedOut) {
