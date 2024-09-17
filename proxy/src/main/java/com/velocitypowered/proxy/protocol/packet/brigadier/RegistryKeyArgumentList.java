@@ -25,7 +25,7 @@ public final class RegistryKeyArgumentList {
 
   public static class ResourceOrTag extends RegistryKeyArgument {
 
-    public ResourceOrTag(String identifier) {
+    public ResourceOrTag(final String identifier) {
       super(identifier);
     }
 
@@ -34,12 +34,12 @@ public final class RegistryKeyArgumentList {
       static final ResourceOrTag.Serializer REGISTRY = new ResourceOrTag.Serializer();
 
       @Override
-      public ResourceOrTag deserialize(ByteBuf buf, ProtocolVersion protocolVersion) {
+      public ResourceOrTag deserialize(final ByteBuf buf, final ProtocolVersion protocolVersion) {
         return new ResourceOrTag(ProtocolUtils.readString(buf));
       }
 
       @Override
-      public void serialize(ResourceOrTag object, ByteBuf buf, ProtocolVersion protocolVersion) {
+      public void serialize(final ResourceOrTag object, final ByteBuf buf, final ProtocolVersion protocolVersion) {
         ProtocolUtils.writeString(buf, object.getIdentifier());
       }
     }
@@ -47,7 +47,7 @@ public final class RegistryKeyArgumentList {
 
   public static class ResourceOrTagKey extends RegistryKeyArgument {
 
-    public ResourceOrTagKey(String identifier) {
+    public ResourceOrTagKey(final String identifier) {
       super(identifier);
     }
 
@@ -56,12 +56,12 @@ public final class RegistryKeyArgumentList {
       static final ResourceOrTagKey.Serializer REGISTRY = new ResourceOrTagKey.Serializer();
 
       @Override
-      public ResourceOrTagKey deserialize(ByteBuf buf, ProtocolVersion protocolVersion) {
+      public ResourceOrTagKey deserialize(final ByteBuf buf, final ProtocolVersion protocolVersion) {
         return new ResourceOrTagKey(ProtocolUtils.readString(buf));
       }
 
       @Override
-      public void serialize(ResourceOrTagKey object, ByteBuf buf, ProtocolVersion protocolVersion) {
+      public void serialize(final ResourceOrTagKey object, final ByteBuf buf, final ProtocolVersion protocolVersion) {
         ProtocolUtils.writeString(buf, object.getIdentifier());
       }
     }
@@ -69,7 +69,7 @@ public final class RegistryKeyArgumentList {
 
   public static class Resource extends RegistryKeyArgument {
 
-    public Resource(String identifier) {
+    public Resource(final String identifier) {
       super(identifier);
     }
 
@@ -78,12 +78,12 @@ public final class RegistryKeyArgumentList {
       static final Resource.Serializer REGISTRY = new Resource.Serializer();
 
       @Override
-      public Resource deserialize(ByteBuf buf, ProtocolVersion protocolVersion) {
+      public Resource deserialize(final ByteBuf buf, final ProtocolVersion protocolVersion) {
         return new Resource(ProtocolUtils.readString(buf));
       }
 
       @Override
-      public void serialize(Resource object, ByteBuf buf, ProtocolVersion protocolVersion) {
+      public void serialize(final Resource object, final ByteBuf buf, final ProtocolVersion protocolVersion) {
         ProtocolUtils.writeString(buf, object.getIdentifier());
       }
     }
@@ -91,7 +91,7 @@ public final class RegistryKeyArgumentList {
 
   public static class ResourceKey extends RegistryKeyArgument {
 
-    public ResourceKey(String identifier) {
+    public ResourceKey(final String identifier) {
       super(identifier);
     }
 
@@ -100,12 +100,12 @@ public final class RegistryKeyArgumentList {
       static final ResourceKey.Serializer REGISTRY = new ResourceKey.Serializer();
 
       @Override
-      public ResourceKey deserialize(ByteBuf buf, ProtocolVersion protocolVersion) {
+      public ResourceKey deserialize(final ByteBuf buf, final ProtocolVersion protocolVersion) {
         return new ResourceKey(ProtocolUtils.readString(buf));
       }
 
       @Override
-      public void serialize(ResourceKey object, ByteBuf buf, ProtocolVersion protocolVersion) {
+      public void serialize(final ResourceKey object, final ByteBuf buf, final ProtocolVersion protocolVersion) {
         ProtocolUtils.writeString(buf, object.getIdentifier());
       }
     }

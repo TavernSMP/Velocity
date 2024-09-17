@@ -38,7 +38,7 @@ public class KeyedChatHandler implements
   private final VelocityServer server;
   private final ConnectedPlayer player;
 
-  public KeyedChatHandler(VelocityServer server, ConnectedPlayer player) {
+  public KeyedChatHandler(final VelocityServer server, final ConnectedPlayer player) {
     this.server = server;
     this.player = player;
   }
@@ -48,7 +48,7 @@ public class KeyedChatHandler implements
     return KeyedPlayerChatPacket.class;
   }
 
-  public static void invalidCancel(Logger logger, ConnectedPlayer player) {
+  public static void invalidCancel(final Logger logger, final ConnectedPlayer player) {
     logger.fatal("A plugin tried to cancel a signed chat message."
         + " This is no longer possible in 1.19.1 and newer. "
         + "Disconnecting player " + player.getUsername());
@@ -56,7 +56,7 @@ public class KeyedChatHandler implements
         + "Contact your network administrator."));
   }
 
-  public static void invalidChange(Logger logger, ConnectedPlayer player) {
+  public static void invalidChange(final Logger logger, final ConnectedPlayer player) {
     logger.fatal("A plugin tried to change a signed chat message. "
         + "This is no longer possible in 1.19.1 and newer. "
         + "Disconnecting player " + player.getUsername());
@@ -65,7 +65,7 @@ public class KeyedChatHandler implements
   }
 
   @Override
-  public void handlePlayerChatInternal(KeyedPlayerChatPacket packet) {
+  public void handlePlayerChatInternal(final KeyedPlayerChatPacket packet) {
     ChatQueue chatQueue = this.player.getChatQueue();
     EventManager eventManager = this.server.getEventManager();
     PlayerChatEvent toSend = new PlayerChatEvent(player, packet.getMessage());
@@ -100,7 +100,7 @@ public class KeyedChatHandler implements
     );
   }
 
-  private Function<PlayerChatEvent, MinecraftPacket> handleOldSignedChat(KeyedPlayerChatPacket packet) {
+  private Function<PlayerChatEvent, MinecraftPacket> handleOldSignedChat(final KeyedPlayerChatPacket packet) {
     IdentifiedKey playerKey = this.player.getIdentifiedKey();
     assert playerKey != null;
     return pme -> {

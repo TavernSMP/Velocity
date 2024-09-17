@@ -29,7 +29,7 @@ public class LegacyCommandHandler implements CommandHandler<LegacyChatPacket> {
   private final ConnectedPlayer player;
   private final VelocityServer server;
 
-  public LegacyCommandHandler(ConnectedPlayer player, VelocityServer server) {
+  public LegacyCommandHandler(final ConnectedPlayer player, final VelocityServer server) {
     this.player = player;
     this.server = server;
   }
@@ -40,7 +40,7 @@ public class LegacyCommandHandler implements CommandHandler<LegacyChatPacket> {
   }
 
   @Override
-  public void handlePlayerCommandInternal(LegacyChatPacket packet) {
+  public void handlePlayerCommandInternal(final LegacyChatPacket packet) {
     String command = packet.getMessage().substring(1);
     queueCommandResult(this.server, this.player, (event, newLastSeenMessages) -> {
       CommandExecuteEvent.CommandResult result = event.getResult();

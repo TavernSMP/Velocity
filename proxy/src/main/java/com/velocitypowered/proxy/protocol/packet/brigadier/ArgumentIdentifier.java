@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ArgumentIdentifier {
+public final class ArgumentIdentifier {
 
   private final String identifier;
   private final Map<ProtocolVersion, Integer> versionById;
 
-  private ArgumentIdentifier(String identifier, VersionSet... versions) {
+  private ArgumentIdentifier(final String identifier, final VersionSet... versions) {
     this.identifier = Preconditions.checkNotNull(identifier);
 
     Preconditions.checkNotNull(versions);
@@ -62,27 +62,27 @@ public class ArgumentIdentifier {
     return identifier;
   }
 
-  public @Nullable Integer getIdByProtocolVersion(ProtocolVersion version) {
+  public @Nullable Integer getIdByProtocolVersion(final ProtocolVersion version) {
     return versionById.get(Preconditions.checkNotNull(version));
   }
 
-  public static VersionSet mapSet(ProtocolVersion version, int id) {
+  public static VersionSet mapSet(final ProtocolVersion version, final int id) {
     return new VersionSet(version, id);
   }
 
-  public static ArgumentIdentifier id(String identifier, VersionSet... versions) {
+  public static ArgumentIdentifier id(final String identifier, final VersionSet... versions) {
     return new ArgumentIdentifier(identifier, versions);
   }
 
   /**
    * This class is purely for convenience.
    */
-  public static class VersionSet {
+  public static final class VersionSet {
 
     private final ProtocolVersion version;
     private final int id;
 
-    private VersionSet(ProtocolVersion version, int id) {
+    private VersionSet(final ProtocolVersion version, final int id) {
       this.version = Preconditions.checkNotNull(version);
       this.id = id;
     }

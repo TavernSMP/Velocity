@@ -50,8 +50,30 @@ public final class VelocityArgumentBuilder<S, T>
     return new VelocityArgumentBuilder<>(name, type);
   }
 
+  /**
+   * The name of the argument.
+   *
+   * <p>This field stores the name of the argument being processed or referenced. It is used to
+   * identify the argument within commands or functions.</p>
+   */
   private final String name;
+
+  /**
+   * The type of the argument.
+   *
+   * <p>This field represents the {@link ArgumentType} of the argument, defining the expected
+   * data type or structure for the argument (e.g., string, integer, etc.).</p>
+   * <@T> the type of the argument
+   */
   private final ArgumentType<T> type;
+
+  /**
+   * A provider for auto-completion or suggestions.
+   *
+   * <p>This field holds an optional {@link SuggestionProvider} used to offer dynamic suggestions
+   * to the user when they are entering a command. It may be {@code null} if no suggestions are provided.</p>
+   * <@S> the type used by the suggestion provider (typically the source of the command)
+   */
   private SuggestionProvider<S> suggestionsProvider = null;
 
   private VelocityArgumentBuilder(final String name, final ArgumentType<T> type) {
@@ -59,6 +81,15 @@ public final class VelocityArgumentBuilder<S, T>
     this.type = type;
   }
 
+  /**
+   * Sets the {@link SuggestionProvider} for this argument builder to provide auto-completion suggestions.
+   *
+   * <p>This method allows the specification of a {@code SuggestionProvider}, which is used to generate
+   * dynamic suggestions for the command argument when the user is typing.</p>
+   *
+   * @param provider the {@link SuggestionProvider} that will supply suggestions, or {@code null} if no suggestions are provided
+   * @return the current {@link VelocityArgumentBuilder} instance for method chaining
+   */
   public VelocityArgumentBuilder<S, T> suggests(final @Nullable SuggestionProvider<S> provider) {
     this.suggestionsProvider = provider;
     return this;

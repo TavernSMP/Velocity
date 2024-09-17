@@ -44,7 +44,7 @@ public class LegacyChatPacket implements MinecraftPacket {
   /**
    * Creates a Chat packet.
    */
-  public LegacyChatPacket(@Nullable String message, byte type, @Nullable UUID sender) {
+  public LegacyChatPacket(@Nullable final String message, final byte type, @Nullable final UUID sender) {
     this.message = message;
     this.type = type;
     this.sender = sender;
@@ -60,7 +60,7 @@ public class LegacyChatPacket implements MinecraftPacket {
     return message;
   }
 
-  public void setMessage(@Nullable String message) {
+  public void setMessage(@Nullable final String message) {
     this.message = message;
   }
 
@@ -68,7 +68,7 @@ public class LegacyChatPacket implements MinecraftPacket {
     return type;
   }
 
-  public void setType(byte type) {
+  public void setType(final byte type) {
     this.type = type;
   }
 
@@ -76,7 +76,7 @@ public class LegacyChatPacket implements MinecraftPacket {
     return sender;
   }
 
-  public void setSenderUuid(UUID sender) {
+  public void setSenderUuid(final UUID sender) {
     this.sender = sender;
   }
 
@@ -90,7 +90,7 @@ public class LegacyChatPacket implements MinecraftPacket {
   }
 
   @Override
-  public void decode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
+  public void decode(final ByteBuf buf, final ProtocolUtils.Direction direction, final ProtocolVersion version) {
     message = ProtocolUtils.readString(buf);
     if (direction == ProtocolUtils.Direction.CLIENTBOUND
         && version.noLessThan(ProtocolVersion.MINECRAFT_1_8)) {
@@ -102,7 +102,7 @@ public class LegacyChatPacket implements MinecraftPacket {
   }
 
   @Override
-  public void encode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion version) {
+  public void encode(final ByteBuf buf, final ProtocolUtils.Direction direction, final ProtocolVersion version) {
     if (message == null) {
       throw new IllegalStateException("Message is not specified");
     }
@@ -117,7 +117,7 @@ public class LegacyChatPacket implements MinecraftPacket {
   }
 
   @Override
-  public boolean handle(MinecraftSessionHandler handler) {
+  public boolean handle(final MinecraftSessionHandler handler) {
     return handler.handle(this);
   }
 }

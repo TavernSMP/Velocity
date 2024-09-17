@@ -31,7 +31,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
   private final ConnectedPlayer player;
   private final VelocityServer server;
 
-  public KeyedCommandHandler(ConnectedPlayer player, VelocityServer server) {
+  public KeyedCommandHandler(final ConnectedPlayer player, final VelocityServer server) {
     this.player = player;
     this.server = server;
   }
@@ -42,7 +42,7 @@ public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPac
   }
 
   @Override
-  public void handlePlayerCommandInternal(KeyedPlayerCommandPacket packet) {
+  public void handlePlayerCommandInternal(final KeyedPlayerCommandPacket packet) {
     queueCommandResult(this.server, this.player, (event, newLastSeenMessages) -> {
       CommandExecuteEvent.CommandResult result = event.getResult();
       IdentifiedKey playerKey = player.getIdentifiedKey();

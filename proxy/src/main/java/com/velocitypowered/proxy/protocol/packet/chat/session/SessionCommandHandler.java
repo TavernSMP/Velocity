@@ -32,7 +32,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
   private final ConnectedPlayer player;
   private final VelocityServer server;
 
-  public SessionCommandHandler(ConnectedPlayer player, VelocityServer server) {
+  public SessionCommandHandler(final ConnectedPlayer player, final VelocityServer server) {
     this.player = player;
     this.server = server;
   }
@@ -43,7 +43,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
   }
 
   @Nullable
-  private MinecraftPacket consumeCommand(SessionPlayerCommandPacket packet) {
+  private MinecraftPacket consumeCommand(final SessionPlayerCommandPacket packet) {
     if (packet.lastSeenMessages == null) {
       return null;
     }
@@ -68,7 +68,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
   }
 
   @Nullable
-  private MinecraftPacket forwardCommand(SessionPlayerCommandPacket packet, String newCommand) {
+  private MinecraftPacket forwardCommand(final SessionPlayerCommandPacket packet, final String newCommand) {
     if (newCommand.equals(packet.command)) {
       return packet;
     }
@@ -76,7 +76,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
   }
 
   @Nullable
-  private MinecraftPacket modifyCommand(SessionPlayerCommandPacket packet, String newCommand) {
+  private MinecraftPacket modifyCommand(final SessionPlayerCommandPacket packet, final String newCommand) {
     if (server.getConfiguration().enforceChatSigning() && packet.isSigned()) {
       logger.fatal("A plugin tried to change a command with signed component(s). "
           + "This is not supported. "
@@ -97,7 +97,7 @@ public class SessionCommandHandler implements CommandHandler<SessionPlayerComman
   }
 
   @Override
-  public void handlePlayerCommandInternal(SessionPlayerCommandPacket packet) {
+  public void handlePlayerCommandInternal(final SessionPlayerCommandPacket packet) {
     queueCommandResult(this.server, this.player, (event, newLastSeenMessages) -> {
       SessionPlayerCommandPacket fixedPacket = packet.withLastSeenMessages(newLastSeenMessages);
 

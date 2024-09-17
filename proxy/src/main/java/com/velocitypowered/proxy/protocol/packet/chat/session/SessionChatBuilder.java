@@ -28,7 +28,7 @@ import net.kyori.adventure.text.Component;
 
 public class SessionChatBuilder extends ChatBuilderV2 {
 
-  public SessionChatBuilder(ProtocolVersion version) {
+  public SessionChatBuilder(final ProtocolVersion version) {
     super(version);
   }
 

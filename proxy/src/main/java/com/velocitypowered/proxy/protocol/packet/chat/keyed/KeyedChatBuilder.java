@@ -28,7 +28,7 @@ import net.kyori.adventure.text.Component;
 
 public class KeyedChatBuilder extends ChatBuilderV2 {
 
-  public KeyedChatBuilder(ProtocolVersion version) {
+  public KeyedChatBuilder(final ProtocolVersion version) {
     super(version);
   }
 

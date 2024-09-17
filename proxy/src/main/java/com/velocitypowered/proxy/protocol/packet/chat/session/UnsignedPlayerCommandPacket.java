@@ -26,17 +26,17 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class UnsignedPlayerCommandPacket extends SessionPlayerCommandPacket {
 
   @Override
-  public void decode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion protocolVersion) {
+  public void decode(final ByteBuf buf, final ProtocolUtils.Direction direction, final ProtocolVersion protocolVersion) {
     this.command = ProtocolUtils.readString(buf, 256);
   }
 
   @Override
-  public void encode(ByteBuf buf, ProtocolUtils.Direction direction, ProtocolVersion protocolVersion) {
+  public void encode(final ByteBuf buf, final ProtocolUtils.Direction direction, final ProtocolVersion protocolVersion) {
     ProtocolUtils.writeString(buf, this.command);
   }
 
   @Override
-  public SessionPlayerCommandPacket withLastSeenMessages(@Nullable LastSeenMessages lastSeenMessages) {
+  public SessionPlayerCommandPacket withLastSeenMessages(@Nullable final LastSeenMessages lastSeenMessages) {
     return this;
   }
 
@@ -46,8 +46,8 @@ public class UnsignedPlayerCommandPacket extends SessionPlayerCommandPacket {
 
   @Override
   public String toString() {
-    return "UnsignedPlayerCommandPacket{" +
-            "command='" + command + '\'' +
-            '}';
+    return "UnsignedPlayerCommandPacket{"
+      + "command='" + command + '\''
+      + '}';
   }
 }

@@ -69,12 +69,12 @@ final class CustomHandlerAdapter<F> {
     return targetInstance -> new EventHandler() {
 
       @Override
-      public void execute(Object event) {
+      public void execute(final Object event) {
         throw new UnsupportedOperationException();
       }
 
       @Override
-      public @Nullable EventTask executeAsync(Object event) {
+      public @Nullable EventTask executeAsync(final Object event) {
         return handlerFunction.apply(targetInstance, event);
       }
     };
