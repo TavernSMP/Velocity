@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * updates the proxy-side boss bar accordingly.</p>
  */
 @AutoService(BossBarImplementation.Provider.class)
+@SuppressWarnings("UnstableApiUsage")
 public class BossBarImplementationProvider implements BossBarImplementation.Provider {
   @Override
   public @NotNull BossBarImplementation create(final @NotNull BossBar bar) {

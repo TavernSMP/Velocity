@@ -177,6 +177,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
   private final ResourcePackHandler resourcePackHandler;
   private final BundleDelimiterHandler bundleHandler = new BundleDelimiterHandler(this);
 
+  @SuppressWarnings("UnstableApiUsage")
   private final @NotNull Pointers pointers =
       Player.super.pointers().toBuilder()
           .withDynamic(Identity.UUID, this::getUniqueId)

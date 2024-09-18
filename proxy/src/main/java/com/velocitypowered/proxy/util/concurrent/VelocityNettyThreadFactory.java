@@ -39,6 +39,11 @@ public class VelocityNettyThreadFactory implements ThreadFactory {
   @Override
   public Thread newThread(@NotNull final Runnable r) {
     String name = String.format(nameFormat, threadNumber.getAndIncrement());
-    return new FastThreadLocalThread(r, name);
+    return new FastThreadLocalThread(name) {
+      @Override
+      public void run() {
+        r.run();
+      }
+    };
   }
 }

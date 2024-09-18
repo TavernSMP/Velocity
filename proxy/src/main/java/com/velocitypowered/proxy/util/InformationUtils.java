@@ -46,7 +46,7 @@ import org.jetbrains.annotations.NotNull;
  * Helper class for {@code /velocity dump}.
  */
 public enum InformationUtils {
-;
+  ;
 
   /**
    * Retrieves a {@link JsonArray} containing basic information about all running plugins on the

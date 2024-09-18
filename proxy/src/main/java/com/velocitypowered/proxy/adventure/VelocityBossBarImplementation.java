@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Implementation of a {@link BossBarImplementation}.
  */
+@SuppressWarnings("UnstableApiUsage")
 public final class VelocityBossBarImplementation implements BossBar.Listener,
     BossBarImplementation {
 

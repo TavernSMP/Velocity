@@ -28,23 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  */
 public final class VelocityBrigadierCommandWrapper implements Command<CommandSource> {
 
-  /**
-   * The command delegate that performs the actual execution logic.
-   *
-   * <p>This field holds a reference to a {@link Command} that is responsible for executing
-   * the command's logic. The delegate allows this class to delegate command execution
-   * to the specified {@link Command} instance.</p>
-   * <@CommandSource> the type of the source that executes the command
-   */
   private final Command<CommandSource> delegate;
-
-  /**
-   * The object responsible for registering this command or component.
-   *
-   * <p>This field holds a reference to the entity (often a class or plugin) that registered
-   * this command or component. It serves as a way to track or associate the registration
-   * with the originating object.</p>
-   */
   private final Object registrant;
 
   private VelocityBrigadierCommandWrapper(final Command<CommandSource> delegate, final Object registrant) {
@@ -77,15 +61,6 @@ public final class VelocityBrigadierCommandWrapper implements Command<CommandSou
     return delegate.run(context);
   }
 
-  /**
-   * Retrieves the object that registered this command or component.
-   *
-   * <p>This method returns the {@code registrant}, which is the entity responsible
-   * for registering this command or component. It provides access to the original
-   * object that initiated the registration.</p>
-   *
-   * @return the object that registered this command or component
-   */
   public Object registrant() {
     return registrant;
   }

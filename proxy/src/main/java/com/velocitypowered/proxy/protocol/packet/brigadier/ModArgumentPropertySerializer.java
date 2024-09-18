@@ -21,7 +21,7 @@ import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.proxy.protocol.ProtocolUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 final class ModArgumentPropertySerializer implements ArgumentPropertySerializer<ModArgumentProperty> {
 
@@ -32,7 +32,7 @@ final class ModArgumentPropertySerializer implements ArgumentPropertySerializer<
   }
 
   @Override
-  public @Nullable ModArgumentProperty deserialize(final ByteBuf buf, final ProtocolVersion version) {
+  public @NotNull ModArgumentProperty deserialize(final ByteBuf buf, final ProtocolVersion version) {
     ArgumentIdentifier identifier;
     if (version.noLessThan(ProtocolVersion.MINECRAFT_1_19)) {
       int idx = ProtocolUtils.readVarInt(buf);

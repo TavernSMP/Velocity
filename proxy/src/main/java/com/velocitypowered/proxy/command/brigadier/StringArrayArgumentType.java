@@ -32,44 +32,11 @@ import java.util.List;
  */
 public final class StringArrayArgumentType implements ArgumentType<String[]> {
 
-  /**
-   * A singleton instance of {@link StringArrayArgumentType}.
-   *
-   * <p>This provides a single shared instance of the {@link StringArrayArgumentType} class
-   * that can be reused throughout the code to avoid unnecessary instantiations.</p>
-   */
   public static final StringArrayArgumentType INSTANCE = new StringArrayArgumentType();
-
-  /**
-   * An empty {@code String} array.
-   *
-   * <p>This constant represents an immutable, zero-length {@code String} array, which can be
-   * used as a default or placeholder where an empty array is required without allocating
-   * new memory for each instance.</p>
-   */
   public static final String[] EMPTY = new String[0];
 
-  /**
-   * A {@link Splitter} instance for splitting strings by words.
-   *
-   * <p>This constant is used to split input strings based on a specific delimiter or pattern,
-   * typically spaces or other word boundaries, into individual words or components.</p>
-   *
-   * <p>It is defined as {@code static final} to ensure the splitter is reused, improving performance by
-   * avoiding the creation of new splitter instances.</p>
-   */
   private static final Splitter WORD_SPLITTER =
       Splitter.on(CommandDispatcher.ARGUMENT_SEPARATOR_CHAR);
-
-  /**
-   * A list of example strings used for reference or testing.
-   *
-   * <p>This constant provides a predefined {@link List} of example strings, which can be used
-   * in various contexts such as documentation, testing, or validation scenarios.</p>
-   *
-   * <p>The list contains sample entries like {@code "word"} and {@code "some words"} to demonstrate
-   * typical input values.</p>
-   */
   private static final List<String> EXAMPLES = Arrays.asList("word", "some words");
 
   private StringArrayArgumentType() {

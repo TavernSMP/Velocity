@@ -205,7 +205,7 @@ public class VelocityScheduler implements Scheduler {
     @Override
     public ScheduledTask schedule() {
       VelocityTask task = new VelocityTask(container, runnable, consumer, delay, repeat);
-      tasksByPlugin.put(container.getInstance().get(), task);
+      container.getInstance().ifPresent(instance -> tasksByPlugin.put(instance, task));
       task.schedule();
       return task;
     }

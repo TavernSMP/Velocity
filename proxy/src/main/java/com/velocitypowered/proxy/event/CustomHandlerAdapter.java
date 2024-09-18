@@ -66,7 +66,7 @@ final class CustomHandlerAdapter<F> {
     final F invokeFunction = LambdaFactory.create(lambdaType, methodHandle);
     final BiFunction<Object, Object, EventTask> handlerFunction =
         handlerBuilder.apply(invokeFunction);
-    return targetInstance -> new EventHandler() {
+    return targetInstance -> new EventHandler<>() {
 
       @Override
       public void execute(final Object event) {

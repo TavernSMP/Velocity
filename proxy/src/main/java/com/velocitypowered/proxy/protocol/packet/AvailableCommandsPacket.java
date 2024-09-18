@@ -25,7 +25,6 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -53,6 +52,14 @@ import java.util.concurrent.CompletableFuture;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Represents a packet that contains the list of available commands, implementing {@link MinecraftPacket}.
+ * <p>
+ * The {@code AvailableCommandsPacket} is responsible for transmitting the set of commands
+ * that a player can execute. It provides the necessary information about available commands
+ * within the current session or game state.
+ * </p>
+ */
 public class AvailableCommandsPacket implements MinecraftPacket {
 
   private static final Command<CommandSource> PLACEHOLDER_COMMAND = source -> 0;
@@ -347,7 +354,7 @@ public class AvailableCommandsPacket implements MinecraftPacket {
 
     @Override
     public CompletableFuture<Suggestions> getSuggestions(final CommandContext<CommandSource> context,
-        final SuggestionsBuilder builder) throws CommandSyntaxException {
+        final SuggestionsBuilder builder) {
       return builder.buildFuture();
     }
   }

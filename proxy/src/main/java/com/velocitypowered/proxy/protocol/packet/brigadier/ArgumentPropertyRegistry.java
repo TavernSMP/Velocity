@@ -46,7 +46,16 @@ import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
 import java.util.Map;
 
-final public class ArgumentPropertyRegistry {
+/**
+ * The {@code ArgumentPropertyRegistry} is responsible for managing the registration and
+ * retrieval of argument properties used in command parsing and execution.
+ * <p>
+ * This class functions as a registry, allowing different argument properties to be registered
+ * and later retrieved or used when processing commands within the system. The properties
+ * might be tied to argument types, validation rules, or transformations.
+ * </p>
+ */
+public final class ArgumentPropertyRegistry {
 
   private ArgumentPropertyRegistry() {
     throw new AssertionError();

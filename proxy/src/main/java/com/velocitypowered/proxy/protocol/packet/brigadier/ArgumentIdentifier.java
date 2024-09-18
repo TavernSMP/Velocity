@@ -24,6 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Represents an identifier for a Brigadier command argument, mapping the argument to
+ * different protocol versions.
+ * <p>
+ * The {@code ArgumentIdentifier} is responsible for holding an identifier string for
+ * an argument and a map that associates protocol versions with their respective IDs.
+ * It ensures that the protocol version is compatible with the Minecraft 1.19 protocol or later.
+ * </p>
+ */
 public final class ArgumentIdentifier {
 
   private final String identifier;

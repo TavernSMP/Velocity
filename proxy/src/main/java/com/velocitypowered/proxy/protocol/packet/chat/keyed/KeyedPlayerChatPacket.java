@@ -30,6 +30,14 @@ import java.time.Instant;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * Represents a player chat packet with support for message signing and preview.
+ * <p>
+ * The {@code KeyedPlayerChatPacket} handles player chat messages, supporting signed previews,
+ * message signatures, and previous message validation. It includes fields for tracking message
+ * signatures and handling expired messages.
+ * </p>
+ */
 public class KeyedPlayerChatPacket implements MinecraftPacket {
 
   private String message;

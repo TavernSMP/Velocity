@@ -26,6 +26,14 @@ import com.velocitypowered.proxy.protocol.packet.chat.builder.ChatBuilderV2;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 
+/**
+ * Handles keyed player commands by implementing {@link CommandHandler}.
+ * <p>
+ * The {@code KeyedCommandHandler} processes commands that are sent using
+ * {@link KeyedPlayerCommandPacket}. It provides the necessary logic for handling
+ * and executing commands associated with specific keys.
+ * </p>
+ */
 public class KeyedCommandHandler implements CommandHandler<KeyedPlayerCommandPacket> {
 
   private final ConnectedPlayer player;

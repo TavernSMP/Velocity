@@ -28,6 +28,12 @@ import io.netty.buffer.Unpooled;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Represents a mod-specific argument property.
+ *
+ * @param identifier the identifier for this argument
+ * @param data the serialized data for this argument
+ */
 public record ModArgumentProperty(ArgumentIdentifier identifier, ByteBuf data) implements ArgumentType<ByteBuf> {
 
   public ModArgumentProperty(final ArgumentIdentifier identifier, final ByteBuf data) {

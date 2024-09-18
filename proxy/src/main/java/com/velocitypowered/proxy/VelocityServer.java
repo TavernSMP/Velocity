@@ -652,7 +652,11 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
     }
 
     if (configuration.isHubEnabled() && !commandManager.hasCommand("hub")) {
-      commandManager.register("hub", new HubCommand(this).register(configuration.isHubEnabled()), "lobby");
+      commandManager.register(
+          commandManager.metaBuilder("hub")
+              .aliases("lobby")
+              .build(),
+          new HubCommand(this).register(configuration.isHubEnabled()));
     }
   }
 

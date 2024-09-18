@@ -34,8 +34,8 @@ public class SignedChatCommand implements KeySigned {
   private final PublicKey signer;
   private final Instant expiry;
   private final byte[] salt;
-  private final UUID sender;
-  //private final boolean isValid;
+  public final UUID sender;
+  // private final boolean isValid;
   private final boolean isPreviewSigned;
 
   private final Map<String, byte[]> signatures;

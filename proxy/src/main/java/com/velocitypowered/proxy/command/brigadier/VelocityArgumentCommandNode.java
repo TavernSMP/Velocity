@@ -49,13 +49,6 @@ import java.util.function.Predicate;
  */
 public class VelocityArgumentCommandNode<S, T> extends ArgumentCommandNode<S, String> {
 
-  /**
-   * The type of the argument.
-   *
-   * <p>This field represents the {@link ArgumentType} of the argument, determining the kind of data
-   * (such as string, integer, etc.) that is expected for this argument in a command context.</p>
-   * <@T> the type of the argument
-   */
   private final ArgumentType<T> type;
 
   VelocityArgumentCommandNode(
@@ -69,17 +62,6 @@ public class VelocityArgumentCommandNode<S, T> extends ArgumentCommandNode<S, St
     this.type = Preconditions.checkNotNull(type, "type");
   }
 
-  /**
-   * Parses the input from the {@link StringReader} and adds the parsed argument to the {@link CommandContextBuilder}.
-   *
-   * <p>This method overrides the default parsing behavior by using the rich {@link ArgumentType}
-   * to parse the input. It ensures that the entire input is consumed by the argument. If there
-   * is leftover input that was not parsed, a {@link CommandSyntaxException} is thrown.</p>
-   *
-   * @param reader the {@link StringReader} providing the input to be parsed
-   * @param contextBuilder the {@link CommandContextBuilder} where the parsed argument will be added
-   * @throws CommandSyntaxException if the argument does not parse all input or if an error occurs during parsing
-   */
   @Override
   public void parse(final StringReader reader, final CommandContextBuilder<S> contextBuilder)
       throws CommandSyntaxException {

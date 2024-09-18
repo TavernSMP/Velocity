@@ -60,6 +60,8 @@ public final class VelocityConsole extends SimpleTerminalConsole implements Cons
 
   private final VelocityServer server;
   private PermissionFunction permissionFunction = ALWAYS_TRUE;
+
+  @SuppressWarnings("UnstableApiUsage")
   private final @NotNull Pointers pointers = ConsoleCommandSource.super.pointers().toBuilder()
       .withDynamic(PermissionChecker.POINTER, this::getPermissionChecker)
       .withDynamic(Identity.LOCALE, () -> ClosestLocaleMatcher.INSTANCE
