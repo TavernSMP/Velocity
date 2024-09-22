@@ -46,7 +46,7 @@ Velocity-CTD is licensed under the GPLv3 license.
   improve performance in plugins like TAB that do not need it.
 * Configurable minimum version value that allows users to block users on versions
   older than your desired minimum server version (synchronizes with outdated pinger).
-* Fallback servers allow users to be sent to the least populated server,
+* Fallback servers allow users to be sent to the least or most populated server,
   which will cycle for even distribution.
 * Configurable server brand and server pinger message (outdated and fallback).
 * Configurable removal of unsigned message kick/disconnection events for plugins
