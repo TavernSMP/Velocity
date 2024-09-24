@@ -7,6 +7,18 @@ and flexibility.
 
 Velocity-CTD is licensed under the GPLv3 license.
 
+## Purpose
+
+Velocity-CTD was created to replace poorly made plugins or
+plugins that simply cannot be better as a result of API limitations,
+lack of support/maintainability, infrequent bumping of integral
+dependencies of Velocity, useful performance improvements, and more.
+
+Many networks have found that plugins that attempt to accomplish the
+same goal are littered with bugs and oddities, that make it hard to
+justify when using them on a large production network, which we
+fully intend to replace by providing our users a clean codebase.
+
 ## Goals
 
 * A codebase that is easy to dive into and consistently follows best practices
