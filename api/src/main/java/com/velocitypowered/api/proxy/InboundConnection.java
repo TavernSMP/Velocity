@@ -32,6 +32,13 @@ public interface InboundConnection {
   Optional<InetSocketAddress> getVirtualHost();
 
   /**
+   * Returns the raw hostname that the client sent, if applicable.
+   *
+   * @return the raw hostname from the client
+   */
+  Optional<String> getRawVirtualHost();
+
+  /**
    * Determine whether the player remains online.
    *
    * @return whether the player active
