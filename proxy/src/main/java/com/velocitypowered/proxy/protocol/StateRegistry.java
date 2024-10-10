@@ -18,31 +18,7 @@
 package com.velocitypowered.proxy.protocol;
 
 import static com.google.common.collect.Iterables.getLast;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_12_1;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_13;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_14;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_15;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_16_4;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_17;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_18;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_18_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_1;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_3;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_19_4;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_3;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_20_5;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_21;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_7_2;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_8;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_9;
-import static com.velocitypowered.api.network.ProtocolVersion.MINECRAFT_1_9_4;
-import static com.velocitypowered.api.network.ProtocolVersion.MINIMUM_VERSION;
-import static com.velocitypowered.api.network.ProtocolVersion.SUPPORTED_VERSIONS;
+import static com.velocitypowered.api.network.ProtocolVersion.*;
 import static com.velocitypowered.proxy.protocol.ProtocolUtils.Direction;
 import static com.velocitypowered.proxy.protocol.ProtocolUtils.Direction.CLIENTBOUND;
 import static com.velocitypowered.proxy.protocol.ProtocolUtils.Direction.SERVERBOUND;
@@ -252,7 +228,8 @@ public enum StateRegistry {
           map(0x08, MINECRAFT_1_19_3, false),
           map(0x09, MINECRAFT_1_19_4, false),
           map(0x0A, MINECRAFT_1_20_2, false),
-          map(0x0B, MINECRAFT_1_20_5, false));
+          map(0x0B, MINECRAFT_1_20_5, false),
+          map(0x0B, MINECRAFT_1_21_2, false));
       serverbound.register(
           LegacyChatPacket.class,
           LegacyChatPacket::new,
