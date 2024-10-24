@@ -232,6 +232,9 @@ public class RespawnPacket implements MinecraftPacket {
     if (version.noLessThan(ProtocolVersion.MINECRAFT_1_20_2)) {
       this.dataToKeep = buf.readByte();
     }
+    if (version.noLessThan(ProtocolVersion.MINECRAFT_1_21_2)) {
+      ProtocolUtils.writeVarInt(buf, seaLevel);
+    }
   }
 
   @Override
