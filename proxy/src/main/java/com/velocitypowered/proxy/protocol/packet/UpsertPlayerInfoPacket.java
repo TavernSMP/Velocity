@@ -234,6 +234,7 @@ public class UpsertPlayerInfoPacket implements MinecraftPacket {
     private int gameMode;
     @Nullable
     private ComponentHolder displayName;
+    private boolean showHat;
     @Nullable
     private RemoteChatSession chatSession;
 
@@ -281,6 +282,14 @@ public class UpsertPlayerInfoPacket implements MinecraftPacket {
 
     public void setLatency(final int latency) {
       this.latency = latency;
+    }
+
+    public boolean getShowHat() {
+      return showHat;
+    }
+
+    public void setShowHat(final boolean showHat) {
+      this.showHat = showHat;
     }
 
     public void setGameMode(final int gameMode) {
